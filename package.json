@@ -1,0 +1,46 @@
+{
+  "name": "rscexplorer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "build:version": "node scripts/build-version.js",
+    "build:versions": "node scripts/build-version.js --all",
+    "dev": "vite",
+    "preview": "vite preview",
+    "deploy": "npm install && npm test && npm run build:versions && wrangler pages deploy dist --project-name=rscexplorer",
+    "test": "vitest run --reporter=verbose"
+  },
+  "keywords": [],
+  "author": "Dan Abramov <dan.abramov@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/standalone": "^7.28.5",
+    "@codemirror/autocomplete": "^6.20.0",
+    "@codemirror/commands": "^6.10.0",
+    "@codemirror/lang-javascript": "^6.2.4",
+    "@codemirror/language": "^6.11.3",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/theme-one-dark": "^6.1.3",
+    "@codemirror/view": "^6.39.4",
+    "@lezer/highlight": "^1.2.3",
+    "codemirror": "^6.0.2",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-server-dom-webpack": "19.2.3",
+    "text-encoding": "^0.7.0",
+    "web-streams-polyfill": "^4.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
+    "@vitest/browser": "^4.0.15",
+    "@vitest/browser-playwright": "^4.0.15",
+    "playwright": "^1.57.0",
+    "rolldown": "^1.0.0-beta.54",
+    "vite": "npm:rolldown-vite@latest",
+    "vitest": "^4.0.15",
+    "wrangler": "^4.0.0"
+  }
+}
