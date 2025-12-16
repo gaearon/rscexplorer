@@ -28,8 +28,13 @@ export function createHelpers(page) {
     return (await frameRef.locator('.preview-container').innerText()).trim().replace(/\s+/g, ' ');
   }
 
+  // Button indices:
+  // 0 = Reset, 1 = Play/Pause, 2 = Step Backward, 3 = Step Forward, 4 = Skip to End
+  const STEP_BACK_BTN_INDEX = 2;
+  const STEP_FORWARD_BTN_INDEX = 3;
+
   async function doStep() {
-    const btn = frameRef.locator('.control-btn').nth(2);
+    const btn = frameRef.locator('.control-btn').nth(STEP_FORWARD_BTN_INDEX);
     if (await btn.isDisabled()) return null;
     await btn.click();
     await pageRef.waitForTimeout(50);
@@ -63,6 +68,19 @@ export function createHelpers(page) {
     return await tree();
   }
 
+  async function doStepBack() {
+    const btn = frameRef.locator('.control-btn').nth(STEP_BACK_BTN_INDEX);
+    if (await btn.isDisabled()) return null;
+    await btn.click();
+    await pageRef.waitForTimeout(50);
+
+    // After stepping back, reset tracking state since we're replaying
+    prevRowTexts = [];
+    prevStatuses = [];
+
+    return await tree();
+  }
+
   async function step() {
     // Check for unasserted preview changes before stepping
     const currentPreview = await getPreviewText();
@@ -74,12 +92,48 @@ export function createHelpers(page) {
   }
 
   async function waitForStepButton() {
-    const btn = frameRef.locator('.control-btn').nth(2);
+    const btn = frameRef.locator('.control-btn').nth(STEP_FORWARD_BTN_INDEX);
     // Wait for button to be enabled
     await expect.poll(async () => {
       return !(await btn.isDisabled());
     }, { timeout: 10000 }).toBe(true);
     await pageRef.waitForTimeout(50);
+  }
+
+  async function stepBack() {
+    previewAsserted = false;
+    return await doStepBack();
+  }
+
+  async function seek(position) {
+    const slider = frameRef.locator('.step-slider');
+    await slider.fill(String(position));
+    await pageRef.waitForTimeout(50);
+
+    // Reset tracking state since we may have jumped around
+    prevRowTexts = [];
+    prevStatuses = [];
+    previewAsserted = false;
+
+    return await tree();
+  }
+
+  async function getCursor() {
+    const info = await frameRef.locator('.step-info').innerText();
+    const match = info.trim().match(/^(\d+)\s*\/\s*(\d+)$/);
+    if (match) {
+      return { cursor: parseInt(match[1], 10), total: parseInt(match[2], 10) };
+    }
+    if (info.trim() === 'Ready') {
+      const totalMatch = await frameRef.locator('.step-slider').getAttribute('max');
+      return { cursor: 0, total: parseInt(totalMatch, 10) };
+    }
+    if (info.trim() === 'Done') {
+      const totalMatch = await frameRef.locator('.step-slider').getAttribute('max');
+      const total = parseInt(totalMatch, 10);
+      return { cursor: total, total };
+    }
+    return null;
   }
 
   async function stepAll() {
@@ -174,7 +228,7 @@ export function createHelpers(page) {
 
     // Consume remaining steps, but fail if tree or preview changes
     while (true) {
-      const btn = frameRef.locator('.control-btn').nth(2);
+      const btn = frameRef.locator('.control-btn').nth(STEP_FORWARD_BTN_INDEX);
       if (await btn.isDisabled()) break;
 
       await btn.click();
@@ -208,5 +262,5 @@ export function createHelpers(page) {
     throw new Error(`waitFor timed out after ${timeout}ms`);
   }
 
-  return { load, step, stepAll, stepInfo, getRows, preview, tree, checkNoRemainingSteps, frame, waitFor };
+  return { load, step, stepBack, stepAll, stepInfo, getRows, preview, tree, checkNoRemainingSteps, frame, waitFor, seek, getCursor };
 }

@@ -34,6 +34,8 @@ export function LivePreview({
   isAtStart,
   isAtEnd,
   onStep,
+  onStepBack,
+  onSeek,
   onSkip,
   onReset
 }) {
@@ -60,9 +62,14 @@ export function LivePreview({
   const showPlaceholder = !clientModuleReady || cursor === 0;
 
   const handlePlayPause = () => setIsPlaying(!isPlaying);
+  const handleStepBack = () => { setIsPlaying(false); onStepBack(); };
   const handleStep = () => { setIsPlaying(false); onStep(); };
   const handleSkip = () => { setIsPlaying(false); onSkip(); };
   const handleReset = () => { setIsPlaying(false); onReset(); };
+  const handleSliderChange = (e) => {
+    setIsPlaying(false);
+    onSeek(parseInt(e.target.value, 10));
+  };
 
   let statusText = '';
   if (isAtStart) {
@@ -105,6 +112,16 @@ export function LivePreview({
             )}
           </button>
           <button
+            className={`control-btn ${!isAtStart ? 'step-btn-back' : ''}`}
+            onClick={handleStepBack}
+            disabled={isAtStart}
+            title="Step backward"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M15 6l-6 6 6 6"/>
+            </svg>
+          </button>
+          <button
             className={`control-btn ${!isAtEnd ? 'step-btn' : ''}`}
             onClick={handleStep}
             disabled={isAtEnd}
@@ -130,8 +147,7 @@ export function LivePreview({
           min="0"
           max={totalChunks}
           value={cursor}
-          onChange={() => {}}
-          disabled
+          onChange={handleSliderChange}
           className="step-slider"
         />
         <span className="step-info">{statusText}</span>

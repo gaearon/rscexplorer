@@ -40,6 +40,14 @@ export function Workspace({ initialServerCode, initialClientCode, onCodeChange }
     timeline.stepForward();
   }, [timeline]);
 
+  const handleStepBack = useCallback(() => {
+    timeline.stepBackward();
+  }, [timeline]);
+
+  const handleSeek = useCallback((position) => {
+    timeline.seekTo(position);
+  }, [timeline]);
+
   const handleSkip = useCallback(() => {
     timeline.skipToEntryEnd();
   }, [timeline]);
@@ -147,6 +155,8 @@ export function Workspace({ initialServerCode, initialClientCode, onCodeChange }
         isAtStart={isAtStart}
         isAtEnd={isAtEnd}
         onStep={handleStep}
+        onStepBack={handleStepBack}
+        onSeek={handleSeek}
         onSkip={handleSkip}
         onReset={handleReset}
       />

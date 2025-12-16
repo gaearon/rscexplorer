@@ -5,12 +5,27 @@ import { createFromReadableStream } from 'react-server-dom-webpack/client';
  *
  * Buffers incoming rows and controls their release to the Flight decoder.
  * The flightPromise only resolves when all rows have been released.
+ * Supports reset() to create a fresh stream for backward navigation.
  */
 export class SteppableStream {
   constructor(source, { callServer } = {}) {
     this.rows = [];
     this.releasedCount = 0;
     this.buffered = false;
+    this.closed = false;
+    this.callServer = callServer;
+
+    this._createStream();
+
+    if (source) {
+      this.bufferPromise = this.buffer(source);
+    } else {
+      this.bufferPromise = Promise.resolve();
+    }
+  }
+
+  _createStream() {
+    this.releasedCount = 0;
     this.closed = false;
 
     const encoder = new TextEncoder();
@@ -30,8 +45,15 @@ export class SteppableStream {
       }
     };
 
-    this.flightPromise = createFromReadableStream(output, { callServer });
-    this.bufferPromise = this.buffer(source);
+    this.flightPromise = createFromReadableStream(output, { callServer: this.callServer });
+  }
+
+  /**
+   * Reset the stream to allow replaying from the beginning.
+   * Creates a fresh ReadableStream and Flight promise.
+   */
+  reset() {
+    this._createStream();
   }
 
   async buffer(stream) {

@@ -561,17 +561,20 @@ main {
 .control-btn.play-btn.playing {
   color: #ffd54f;
 }
-.control-btn.step-btn {
+.control-btn.step-btn,
+.control-btn.step-btn-back {
   background: #ffd54f;
   color: #000;
   animation: pulse-step 1.5s ease-in-out infinite;
 }
-.control-btn.step-btn:hover:not(:disabled) {
+.control-btn.step-btn:hover:not(:disabled),
+.control-btn.step-btn-back:hover:not(:disabled) {
   background: #ffe566;
   color: #000;
   animation: none;
 }
-.control-btn.step-btn:disabled {
+.control-btn.step-btn:disabled,
+.control-btn.step-btn-back:disabled {
   background: transparent;
   color: var(--text);
   animation: none;
@@ -607,8 +610,8 @@ main {
   cursor: pointer;
   border: none;
 }
-.step-slider:disabled {
-  opacity: 0.5;
+.step-slider:hover {
+  cursor: pointer;
 }
 .step-info {
   font-size: 11px;

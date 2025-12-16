@@ -92,16 +92,68 @@ export class Timeline {
     return true;
   }
 
-  stepForward() {
-    const total = this.getTotalChunks();
-    if (this.cursor >= total) return;
-
+  // Advance cursor and release chunk without notifying (internal helper)
+  _releaseNext() {
     const pos = this.getPosition(this.cursor);
-    if (!pos) return;
-
+    if (!pos) return false;
     const entry = this.entries[pos.entryIndex];
     this.cursor++;
     entry.stream.release(pos.localChunk + 1);
+    return true;
+  }
+
+  stepForward() {
+    const total = this.getTotalChunks();
+    if (this.cursor >= total) return;
+    this._releaseNext();
+    this.notify();
+  }
+
+  stepBackward() {
+    if (this.cursor <= 0) return;
+    this.seekTo(this.cursor - 1);
+  }
+
+  /**
+   * Seek to a specific position in the timeline.
+   * For backward seeks, this resets streams and replays to the target position.
+   * Entries that start after the target position are removed (actions that haven't happened yet).
+   */
+  seekTo(targetCursor) {
+    const total = this.getTotalChunks();
+    const clampedTarget = Math.max(0, Math.min(targetCursor, total));
+
+    if (clampedTarget === this.cursor) return;
+
+    if (clampedTarget > this.cursor) {
+      // Forward seek: release chunks until we reach target
+      while (this.cursor < clampedTarget) {
+        if (!this._releaseNext()) break;
+      }
+    } else {
+      // Backward seek: keep entries whose start position <= target
+      let entriesToKeep = 0;
+      let entryStart = 0;
+      for (let i = 0; i < this.entries.length; i++) {
+        if (entryStart > clampedTarget) break; // This entry starts after target
+        entriesToKeep++;
+        entryStart += this.getChunkCount(this.entries[i]);
+      }
+
+      // Remove entries that start after the target position
+      this.entries = this.entries.slice(0, entriesToKeep);
+
+      // Reset streams for remaining entries
+      for (const entry of this.entries) {
+        entry.stream.reset();
+      }
+      this.cursor = 0;
+
+      // Replay to target position
+      while (this.cursor < clampedTarget) {
+        if (!this._releaseNext()) break;
+      }
+    }
 
     this.notify();
   }
