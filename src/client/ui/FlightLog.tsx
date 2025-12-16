@@ -24,7 +24,7 @@ function RenderLogView({
     cursor >= chunkStart && cursor < chunkStart + lines.length ? cursor - chunkStart : -1;
 
   useEffect(() => {
-    if (activeRef.current) {
+    if (activeRef.current && document.hasFocus()) {
       activeRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
   }, [nextLineIndex]);
