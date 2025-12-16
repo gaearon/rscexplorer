@@ -18,34 +18,40 @@ function rolldownWorkerPlugin() {
         return '\0worker:' + resolve(dirname(importer), id.replace('?rolldown-worker', ''));
       }
     },
-    async load(id) {
-      if (!id.startsWith('\0worker:')) return;
-      const isProd = mode === 'production';
-      const { rolldown } = await import('rolldown');
-      // Use 'production' or 'development' condition to match React's export conditions
-      const conditions = isProd
-        ? ['react-server', 'production', 'browser', 'import', 'default']
-        : ['react-server', 'development', 'browser', 'import', 'default'];
-      const bundle = await rolldown({
-        input: id.slice('\0worker:'.length),
-        platform: 'browser',
-        resolve: { conditionNames: conditions },
-        transform: {
-          define: {
-            'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : 'development'),
+    load: {
+      filter: {
+        id: {
+          include: /^\0worker:/,
+        }
+      },
+      async handler(id) {
+        const isProd = mode === 'production';
+        const { rolldown } = await import('rolldown');
+        // Use 'production' or 'development' condition to match React's export conditions
+        const conditions = isProd
+          ? ['react-server', 'production', 'browser', 'import', 'default']
+          : ['react-server', 'development', 'browser', 'import', 'default'];
+        const bundle = await rolldown({
+          input: id.slice('\0worker:'.length),
+          platform: 'browser',
+          resolve: { conditionNames: conditions },
+          transform: {
+            define: {
+              'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : 'development'),
+            },
           },
-        },
-      });
-      const { output } = await bundle.generate({ format: 'iife', minify: isProd });
-      for (const dep of output[0].moduleIds) {
-        if (dep.startsWith('/')) this.addWatchFile(dep);
-      }
-      await bundle.close();
-      return `
-export default URL.createObjectURL(new Blob([${JSON.stringify(output[0].code)}], { type: 'application/javascript' }));
-if (import.meta.hot) import.meta.hot.accept(() => location.reload());`;
-    },
-  };
+        });
+        const { output } = await bundle.generate({ format: 'iife', minify: isProd });
+        for (const dep of output[0].moduleIds) {
+          if (dep.startsWith('/')) this.addWatchFile(dep);
+        }
+        await bundle.close();
+        return `
+  export default URL.createObjectURL(new Blob([${JSON.stringify(output[0].code)}], { type: 'application/javascript' }));
+  if (import.meta.hot) import.meta.hot.accept(() => location.reload());`;
+      },
+    }
+  }
 }
 
 function serveEmbedPlugin() {
@@ -74,7 +80,7 @@ export default defineConfig(({ mode }) => ({
       : ['production', 'browser', 'import', 'default'],
   },
   build: {
-    rollupOptions: {
+    rolldownOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
         embed: resolve(__dirname, 'embed.html'),
