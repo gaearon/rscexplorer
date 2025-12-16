@@ -37,7 +37,7 @@
       padding: 0 16px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
       border-bottom: 1px solid var(--border);
       background: var(--surface);
       flex-shrink: 0;
@@ -54,7 +54,6 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-left: 16px;
       padding-left: 16px;
       border-left: 1px solid var(--border);
     }
@@ -231,8 +230,6 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding-left: 12px;
-      border-left: 1px solid var(--border);
     }
     .build-switcher label {
       font-size: 11px;
@@ -242,6 +239,32 @@
     }
     .build-switcher .mode-select {
       min-width: 70px;
+    }
+    .header-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-right: 16px;
+      border-right: 1px solid var(--border);
+    }
+    .github-link,
+    .tangled-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      padding: 4px;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+    .github-link:hover,
+    .tangled-link:hover {
+      color: var(--text-bright);
+    }
+    @media (max-width: 900px) {
+      .header-links {
+        display: none;
+      }
     }
     @media (max-width: 768px) {
       header {
@@ -270,9 +293,6 @@
         padding: 4px 20px 4px 6px;
         font-size: 16px; /* Prevents iOS zoom */
         background-position: right 4px center;
-      }
-      header .save-btn {
-        display: none;
       }
       .build-switcher {
         padding-left: 6px;
