@@ -197,9 +197,11 @@ function usePagination(initialItems, initialCursor, action) {
   const formAction = () => {
     startTransition(async () => {
       const result = await action(cursor)
-      setItems(prev => [...prev, ...result.newItems])
-      setCursor(result.cursor)
-      setHasMore(result.hasMore)
+      startTransition(() => {
+        setItems(prev => [...prev, ...result.newItems])
+        setCursor(result.cursor)
+        setHasMore(result.hasMore)
+      })
     })
   }
 
