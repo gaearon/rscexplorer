@@ -43,9 +43,15 @@ type CodeEditorProps = {
   defaultValue: string;
   onChange: (code: string) => void;
   label: string;
+  className?: string;
 };
 
-export function CodeEditor({ defaultValue, onChange, label }: CodeEditorProps): React.ReactElement {
+export function CodeEditor({
+  defaultValue,
+  onChange,
+  label,
+  className,
+}: CodeEditorProps): React.ReactElement {
   const [initialDefaultValue] = useState(defaultValue);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -80,7 +86,7 @@ export function CodeEditor({ defaultValue, onChange, label }: CodeEditorProps): 
   }, [initialDefaultValue]);
 
   return (
-    <div className="pane">
+    <div className={`pane${className ? ` ${className}` : ""}`}>
       <div className="pane-header">{label}</div>
       <div className="editor-container" ref={containerRef} />
     </div>

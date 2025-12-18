@@ -1,27 +1,22 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FlightTreeView } from "./TreeView.tsx";
-import type { Timeline, TimelineEntry, Thenable } from "../runtime/index.ts";
+import type { EntryView } from "../runtime/index.ts";
 
 function escapeHtml(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 type RenderLogViewProps = {
-  lines: string[];
-  chunkStart: number;
+  entry: EntryView;
   cursor: number;
-  flightPromise: Thenable<unknown> | undefined;
 };
 
-function RenderLogView({
-  lines,
-  chunkStart,
-  cursor,
-  flightPromise,
-}: RenderLogViewProps): React.ReactElement | null {
+function RenderLogView({ entry, cursor }: RenderLogViewProps): React.ReactElement | null {
   const activeRef = useRef<HTMLSpanElement>(null);
+  const { rows, chunkStart, flightPromise } = entry;
+
   const nextLineIndex =
-    cursor >= chunkStart && cursor < chunkStart + lines.length ? cursor - chunkStart : -1;
+    cursor >= chunkStart && cursor < chunkStart + rows.length ? cursor - chunkStart : -1;
 
   useEffect(() => {
     if (activeRef.current && document.hasFocus()) {
@@ -29,7 +24,7 @@ function RenderLogView({
     }
   }, [nextLineIndex]);
 
-  if (lines.length === 0) return null;
+  if (rows.length === 0) return null;
 
   const getLineClass = (i: number): string => {
     const globalChunk = chunkStart + i;
@@ -45,7 +40,7 @@ function RenderLogView({
       <div className="log-entry-split">
         <div className="log-entry-flight-lines-wrapper">
           <pre className="log-entry-flight-lines">
-            {lines.map((line, i) => (
+            {rows.map((line, i) => (
               <span
                 key={i}
                 ref={i === nextLineIndex ? activeRef : null}
@@ -65,111 +60,55 @@ function RenderLogView({
 }
 
 type FlightLogEntryProps = {
-  entry: TimelineEntry;
-  entryIndex: number;
-  chunkStart: number;
+  entry: EntryView;
+  index: number;
   cursor: number;
-  canDelete: boolean;
   onDelete: (index: number) => void;
-  getChunkCount: (entry: TimelineEntry) => number;
 };
 
 function FlightLogEntry({
   entry,
-  entryIndex,
-  chunkStart,
+  index,
   cursor,
-  canDelete,
   onDelete,
-  getChunkCount,
-}: FlightLogEntryProps): React.ReactElement | null {
-  const chunkCount = getChunkCount(entry);
-  const entryEnd = chunkStart + chunkCount;
-  const isEntryActive = cursor >= chunkStart && cursor < entryEnd;
-  const isEntryDone = cursor >= entryEnd;
+}: FlightLogEntryProps): React.ReactElement {
+  const entryClass = entry.isActive ? "active" : entry.isDone ? "done-entry" : "pending-entry";
 
-  const entryClass = isEntryActive ? "active" : isEntryDone ? "done-entry" : "pending-entry";
-
-  if (entry.type === "render") {
-    const lines = entry.stream.rows;
-    return (
-      <div className={`log-entry ${entryClass}`}>
-        <div className="log-entry-header">
-          <span className="log-entry-label">Render</span>
-          <span className="log-entry-header-right">
-            {canDelete && (
-              <button
-                className="delete-entry-btn"
-                onClick={() => onDelete(entryIndex)}
-                title="Delete"
-              >
-                ×
-              </button>
-            )}
-          </span>
-        </div>
-        <RenderLogView
-          lines={lines}
-          chunkStart={chunkStart}
-          cursor={cursor}
-          flightPromise={entry.stream.flightPromise}
-        />
+  return (
+    <div className={`log-entry ${entryClass}`}>
+      <div className="log-entry-header">
+        <span className="log-entry-label">
+          {entry.type === "render" ? "Render" : `Action: ${entry.name}`}
+        </span>
+        <span className="log-entry-header-right">
+          {entry.canDelete && (
+            <button className="delete-entry-btn" onClick={() => onDelete(index)} title="Delete">
+              ×
+            </button>
+          )}
+        </span>
       </div>
-    );
-  }
-
-  if (entry.type === "action") {
-    const responseLines = entry.stream.rows;
-
-    return (
-      <div className={`log-entry ${entryClass}`}>
-        <div className="log-entry-header">
-          <span className="log-entry-label">Action: {entry.name}</span>
-          <span className="log-entry-header-right">
-            {canDelete && (
-              <button
-                className="delete-entry-btn"
-                onClick={() => onDelete(entryIndex)}
-                title="Delete"
-              >
-                ×
-              </button>
-            )}
-          </span>
+      {entry.type === "action" && entry.args && (
+        <div className="log-entry-request">
+          <pre className="log-entry-request-args">{entry.args}</pre>
         </div>
-        {entry.args && (
-          <div className="log-entry-request">
-            <pre className="log-entry-request-args">{entry.args}</pre>
-          </div>
-        )}
-        <RenderLogView
-          lines={responseLines}
-          chunkStart={chunkStart}
-          cursor={cursor}
-          flightPromise={entry.stream.flightPromise}
-        />
-      </div>
-    );
-  }
-
-  return null;
+      )}
+      <RenderLogView entry={entry} cursor={cursor} />
+    </div>
+  );
 }
 
 type FlightLogProps = {
-  timeline: Timeline;
-  entries: TimelineEntry[];
+  entries: EntryView[];
   cursor: number;
-  error: string | null;
   availableActions: string[];
   onAddRawAction: (actionName: string, rawPayload: string) => void;
   onDeleteEntry: (index: number) => void;
 };
 
 export function FlightLog({
-  timeline,
   entries,
   cursor,
-  error,
   availableActions,
   onAddRawAction,
   onDeleteEntry,
@@ -193,10 +132,6 @@ export function FlightLog({
     setShowRawInput(true);
   };
 
-  if (error) {
-    return <pre className="flight-output error">{error}</pre>;
-  }
-
   if (entries.length === 0) {
     return (
       <div className="flight-output">
@@ -205,32 +140,11 @@ export function FlightLog({
     );
   }
 
-  const getChunkCount = (entry: TimelineEntry): number => timeline.getChunkCount(entry);
-
-  const entryElements: React.ReactElement[] = [];
-  let chunkOffset = 0;
-  for (let i = 0; i < entries.length; i++) {
-    const entry = entries[i];
-    if (!entry) continue;
-    const chunkStart = chunkOffset;
-    chunkOffset += getChunkCount(entry);
-    entryElements.push(
-      <FlightLogEntry
-        key={i}
-        entry={entry}
-        entryIndex={i}
-        chunkStart={chunkStart}
-        cursor={cursor}
-        canDelete={timeline.canDeleteEntry(i)}
-        onDelete={onDeleteEntry}
-        getChunkCount={getChunkCount}
-      />,
-    );
-  }
-
   return (
     <div className="flight-log" ref={logRef}>
-      {entryElements}
+      {entries.map((entry, i) => (
+        <FlightLogEntry key={i} entry={entry} index={i} cursor={cursor} onDelete={onDeleteEntry} />
+      ))}
       {availableActions.length > 0 &&
         (showRawInput ? (
           <div className="raw-input-form">

@@ -40,7 +40,23 @@ main {
   display: grid;
   grid-template-columns: 50% 50%;
   grid-template-rows: 50% 50%;
+  grid-template-areas:
+    "server flight"
+    "client preview";
   overflow: hidden;
+}
+/* Grid area assignments */
+.pane.editor-server {
+  grid-area: server;
+}
+.pane.editor-client {
+  grid-area: client;
+}
+.pane.flight-pane {
+  grid-area: flight;
+}
+.pane.preview-pane {
+  grid-area: preview;
 }
 .pane {
   display: flex;
@@ -48,13 +64,13 @@ main {
   overflow: hidden;
 }
 /* Left column border */
-.pane:nth-child(1),
-.pane:nth-child(3) {
+.pane.editor-server,
+.pane.editor-client {
   border-right: 1px solid var(--border);
 }
 /* Top row border */
-.pane:nth-child(1),
-.pane:nth-child(2) {
+.pane.editor-server,
+.pane.flight-pane {
   border-bottom: 1px solid var(--border);
 }
 .pane-header {

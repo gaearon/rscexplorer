@@ -1,12 +1,5 @@
-import React, {
-  Suspense,
-  Component,
-  useState,
-  useEffect,
-  useSyncExternalStore,
-  type ReactNode,
-} from "react";
-import type { Timeline, Thenable } from "../runtime/index.ts";
+import React, { Suspense, Component, useState, useEffect, type ReactNode } from "react";
+import type { EntryView, Thenable } from "../runtime/index.ts";
 
 type PreviewErrorBoundaryProps = {
   children: ReactNode;
@@ -47,10 +40,9 @@ function StreamingContent({ streamPromise }: StreamingContentProps): ReactNode {
 }
 
 type LivePreviewProps = {
-  timeline: Timeline;
-  clientModuleReady: boolean;
-  totalChunks: number;
+  entries: EntryView[];
   cursor: number;
+  totalChunks: number;
   isAtStart: boolean;
   isAtEnd: boolean;
   onStep: () => void;
@@ -59,20 +51,17 @@ type LivePreviewProps = {
 };
 
 export function LivePreview({
-  timeline,
-  clientModuleReady,
-  totalChunks,
+  entries,
   cursor,
+  totalChunks,
   isAtStart,
   isAtEnd,
   onStep,
   onSkip,
   onReset,
 }: LivePreviewProps): React.ReactElement {
-  const snapshot = useSyncExternalStore(timeline.subscribe, timeline.getSnapshot);
-  const { entries } = snapshot;
   const renderEntry = entries[0];
-  const flightPromise = renderEntry?.stream.flightPromise;
+  const flightPromise = renderEntry?.flightPromise;
 
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -91,7 +80,7 @@ export function LivePreview({
     setIsPlaying(false);
   }, [totalChunks]);
 
-  const showPlaceholder = !clientModuleReady || cursor === 0;
+  const showPlaceholder = entries.length === 0 || cursor === 0;
 
   const handlePlayPause = (): void => setIsPlaying(!isPlaying);
   const handleStep = (): void => {

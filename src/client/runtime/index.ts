@@ -5,11 +5,4 @@ export {
   type Thenable,
   type CallServerCallback,
 } from "./steppable-stream.ts";
-export {
-  Timeline,
-  type TimelineEntry,
-  type RenderEntry,
-  type ActionEntry,
-  type TimelineSnapshot,
-  type TimelinePosition,
-} from "./timeline.ts";
+export { Timeline, type EntryView, type TimelineSnapshot } from "./timeline.ts";

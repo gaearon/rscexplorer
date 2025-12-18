@@ -20,19 +20,26 @@ export class WorkerClient {
   private readyPromise: Promise<void>;
   private readyResolve!: () => void;
 
-  constructor() {
+  constructor(signal: AbortSignal) {
     this.worker = new Worker(workerUrl);
-    this.readyPromise = new Promise((resolve) => {
-      this.readyResolve = resolve;
-    });
-    this.worker.onmessage = this.handleMessage.bind(this);
-    this.worker.onerror = (e) => {
-      const err = new Error(e.message || "Worker error");
+
+    const dispose = (reason: unknown) => {
       for (const controller of this.requests.values()) {
-        controller.error(err);
+        controller.error(reason);
       }
+      this.worker.terminate();
       this.requests.clear();
     };
+
+    this.readyPromise = new Promise((resolve, reject) => {
+      this.readyResolve = resolve;
+      signal.addEventListener("abort", () => {
+        reject(signal.reason);
+        dispose(signal.reason);
+      });
+    });
+    this.worker.onmessage = (msg) => this.handleMessage(msg);
+    this.worker.onerror = (e) => dispose(e.error);
   }
 
   private handleMessage(event: MessageEvent<Response>): void {
@@ -70,7 +77,8 @@ export class WorkerClient {
 
   private nextRequestId = 0;
 
-  private request(body: Record<string, unknown>): ReadableStream<Uint8Array> {
+  private async request(body: Record<string, unknown>): Promise<ReadableStream<Uint8Array>> {
+    await this.readyPromise;
     const requestId = String(this.nextRequestId++);
     let controller!: ReadableStreamDefaultController<Uint8Array>;
     const stream = new ReadableStream<Uint8Array>({
@@ -83,27 +91,15 @@ export class WorkerClient {
     return stream;
   }
 
-  terminate(): void {
-    this.worker.terminate();
-    const err = new Error("Worker terminated");
-    for (const controller of this.requests.values()) {
-      controller.error(err);
-    }
-    this.requests.clear();
-  }
-
-  async deploy(...args: Parameters<Deploy>): Promise<ReturnType<Deploy>> {
-    await this.readyPromise;
+  deploy(...args: Parameters<Deploy>): Promise<ReturnType<Deploy>> {
     return this.request({ method: "deploy", args });
   }
 
-  async render(...args: Parameters<Render>): Promise<ReturnType<Render>> {
-    await this.readyPromise;
+  render(...args: Parameters<Render>): Promise<ReturnType<Render>> {
     return this.request({ method: "render", args });
   }
 
-  async callAction(...args: Parameters<CallAction>): ReturnType<CallAction> {
-    await this.readyPromise;
+  callAction(...args: Parameters<CallAction>): ReturnType<CallAction> {
     return this.request({ method: "action", args });
   }
 }

@@ -1,114 +1,83 @@
-import type { SteppableStream } from "./steppable-stream.ts";
+import type { SteppableStream, Thenable } from "./steppable-stream.ts";
 
-/**
- * Timeline - manages a sequence of Flight responses for debugging.
- *
- * Each entry owns its SteppableStream(s). The cursor controls playback.
- * Stepping releases data to streams; I/O is handled externally.
- *
- * Entry types:
- * - render: { type, stream } - initial render
- * - action: { type, name, args, stream } - action invoked from client or added manually
- */
+type InternalEntry =
+  | { type: "render"; stream: SteppableStream }
+  | { type: "action"; name: string; args: string; stream: SteppableStream };
 
-export interface RenderEntry {
-  type: "render";
-  stream: SteppableStream;
-}
-
-export interface ActionEntry {
-  type: "action";
-  name: string;
-  args: string;
-  stream: SteppableStream;
-}
-
-export type TimelineEntry = RenderEntry | ActionEntry;
+export type EntryView = {
+  type: "render" | "action";
+  name?: string;
+  args?: string;
+  rows: string[];
+  flightPromise: Thenable<unknown> | undefined;
+  chunkStart: number;
+  chunkCount: number;
+  canDelete: boolean;
+  isActive: boolean;
+  isDone: boolean;
+};
 
 export interface TimelineSnapshot {
-  entries: TimelineEntry[];
+  entries: EntryView[];
   cursor: number;
   totalChunks: number;
   isAtStart: boolean;
   isAtEnd: boolean;
 }
 
-export interface TimelinePosition {
-  entryIndex: number;
-  localChunk: number;
-}
-
-type TimelineListener = () => void;
+type Listener = () => void;
 
 export class Timeline {
-  entries: TimelineEntry[] = [];
-  cursor = 0;
-  private listeners: Set<TimelineListener> = new Set();
-  private snapshot: TimelineSnapshot | null = null;
-
-  subscribe = (listener: TimelineListener): (() => void) => {
-    this.listeners.add(listener);
-    return () => {
-      this.listeners.delete(listener);
-    };
-  };
+  private entries: InternalEntry[] = [];
+  private cursor = 0;
+  private listeners = new Set<Listener>();
+  private cachedSnapshot: TimelineSnapshot | null = null;
 
   private notify(): void {
-    this.snapshot = null; // Invalidate cache
-    this.listeners.forEach((fn) => fn());
-  }
-
-  getChunkCount(entry: TimelineEntry): number {
-    return entry.stream.rows.length;
-  }
-
-  getTotalChunks(): number {
-    return this.entries.reduce((sum, e) => sum + this.getChunkCount(e), 0);
-  }
-
-  getPosition(globalChunk: number): TimelinePosition | null {
-    let remaining = globalChunk;
-    for (let i = 0; i < this.entries.length; i++) {
-      const entry = this.entries[i];
-      if (!entry) continue;
-      const count = this.getChunkCount(entry);
-      if (remaining < count) {
-        return { entryIndex: i, localChunk: remaining };
-      }
-      remaining -= count;
+    this.cachedSnapshot = null;
+    for (const fn of this.listeners) {
+      fn();
     }
-    return null;
   }
 
-  getEntryStart(entryIndex: number): number {
-    let start = 0;
-    for (let i = 0; i < entryIndex; i++) {
-      const entry = this.entries[i];
-      if (entry) {
-        start += this.getChunkCount(entry);
-      }
-    }
-    return start;
-  }
+  subscribe = (listener: Listener): (() => void) => {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  };
 
-  canDeleteEntry(entryIndex: number): boolean {
-    if (entryIndex < 0 || entryIndex >= this.entries.length) return false;
-    return this.cursor <= this.getEntryStart(entryIndex);
-  }
-
-  // For useSyncExternalStore compatibility - must return cached object
   getSnapshot = (): TimelineSnapshot => {
-    if (this.snapshot) return this.snapshot;
+    if (this.cachedSnapshot) {
+      return this.cachedSnapshot;
+    }
 
-    const totalChunks = this.getTotalChunks();
-    this.snapshot = {
-      entries: this.entries,
+    let chunkStart = 0;
+    const entries: EntryView[] = this.entries.map((entry) => {
+      const chunkCount = entry.stream.rows.length;
+      const chunkEnd = chunkStart + chunkCount;
+      const base = {
+        rows: entry.stream.rows,
+        flightPromise: entry.stream.flightPromise,
+        chunkStart,
+        chunkCount,
+        canDelete: this.cursor <= chunkStart,
+        isActive: this.cursor >= chunkStart && this.cursor < chunkEnd,
+        isDone: this.cursor >= chunkEnd,
+      };
+      chunkStart = chunkEnd;
+      if (entry.type === "action") {
+        return { type: "action" as const, name: entry.name, args: entry.args, ...base };
+      }
+      return { type: "render" as const, ...base };
+    });
+
+    this.cachedSnapshot = {
+      entries,
       cursor: this.cursor,
-      totalChunks,
+      totalChunks: chunkStart,
       isAtStart: this.cursor === 0,
-      isAtEnd: this.cursor >= totalChunks,
+      isAtEnd: this.cursor >= chunkStart,
     };
-    return this.snapshot;
+    return this.cachedSnapshot;
   };
 
   setRender(stream: SteppableStream): void {
@@ -122,39 +91,45 @@ export class Timeline {
     this.notify();
   }
 
-  deleteEntry(entryIndex: number): boolean {
-    if (!this.canDeleteEntry(entryIndex)) return false;
+  deleteEntry(entryIndex: number): void {
+    let chunkStart = 0;
+    for (let i = 0; i < entryIndex; i++) {
+      chunkStart += this.entries[i]!.stream.rows.length;
+    }
+    if (this.cursor > chunkStart) {
+      return;
+    }
     this.entries = this.entries.filter((_, i) => i !== entryIndex);
     this.notify();
-    return true;
   }
 
   stepForward(): void {
-    const total = this.getTotalChunks();
-    if (this.cursor >= total) return;
-
-    const pos = this.getPosition(this.cursor);
-    if (!pos) return;
-
-    const entry = this.entries[pos.entryIndex];
-    if (!entry) return;
-
-    this.cursor++;
-    entry.stream.release(pos.localChunk + 1);
-
-    this.notify();
+    let remaining = this.cursor;
+    for (const entry of this.entries) {
+      const count = entry.stream.rows.length;
+      if (remaining < count) {
+        entry.stream.release(remaining + 1);
+        this.cursor++;
+        this.notify();
+        return;
+      }
+      remaining -= count;
+    }
   }
 
   skipToEntryEnd(): void {
-    const pos = this.getPosition(this.cursor);
-    if (!pos) return;
-
-    const entry = this.entries[pos.entryIndex];
-    if (!entry) return;
-
-    const entryEnd = this.getEntryStart(pos.entryIndex) + this.getChunkCount(entry);
-    while (this.cursor < entryEnd) {
-      this.stepForward();
+    let remaining = this.cursor;
+    for (const entry of this.entries) {
+      const count = entry.stream.rows.length;
+      if (remaining < count) {
+        for (let local = remaining; local < count; local++) {
+          entry.stream.release(local + 1);
+        }
+        this.cursor += count - remaining;
+        this.notify();
+        return;
+      }
+      remaining -= count;
     }
   }
 
