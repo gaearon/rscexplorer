@@ -111,6 +111,80 @@ export function Form({ greetAction }) {
   )
 }`,
   },
+  refresh: {
+    name: "Router Refresh",
+    server: `import { Suspense } from 'react'
+import { Timer, Router } from './client'
+
+export default function App() {
+  return (
+    <div>
+      <h1>Router Refresh</h1>
+      <p style={{ marginBottom: 12, color: '#666' }}>
+        Client state persists across server navigations
+      </p>
+      <Suspense fallback={<p>Loading...</p>}>
+        <Router initial={renderPage()} refreshAction={renderPage} />
+      </Suspense>
+    </div>
+  )
+}
+
+async function renderPage() {
+  'use server'
+  return <ColorTimer />
+}
+
+async function ColorTimer() {
+  await new Promise(r => setTimeout(r, 300))
+  const hue = Math.floor(Math.random() * 360)
+  return <Timer color={\`hsl(\${hue}, 70%, 85%)\`} />
+}`,
+    client: `'use client'
+
+import { useState, useEffect, useTransition, use } from 'react'
+
+export function Timer({ color }) {
+  const [seconds, setSeconds] = useState(0)
+
+  useEffect(() => {
+    const id = setInterval(() => setSeconds(s => s + 1), 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  return (
+    <div style={{
+      background: color,
+      padding: 24,
+      borderRadius: 8,
+      textAlign: 'center'
+    }}>
+      <p style={{ fontFamily: 'monospace', fontSize: 32, margin: 0 }}>Timer: {seconds}s</p>
+    </div>
+  )
+}
+
+export function Router({ initial, refreshAction }) {
+  const [contentPromise, setContentPromise] = useState(initial)
+  const [isPending, startTransition] = useTransition()
+  const content = use(contentPromise)
+
+  const refresh = () => {
+    startTransition(() => {
+      setContentPromise(refreshAction())
+    })
+  }
+
+  return (
+    <div style={{ opacity: isPending ? 0.7 : 1 }}>
+      {content}
+      <button onClick={refresh} disabled={isPending} style={{ marginTop: 12 }}>
+        {isPending ? 'Refreshing...' : 'Refresh'}
+      </button>
+    </div>
+  )
+}`,
+  },
   pagination: {
     name: "Pagination",
     server: `import { Suspense } from 'react'
@@ -204,80 +278,6 @@ function usePagination(initialItems, initialCursor, action) {
   }
 
   return { items, hasMore, formAction, isPending }
-}`,
-  },
-  refresh: {
-    name: "Router Refresh",
-    server: `import { Suspense } from 'react'
-import { Timer, Router } from './client'
-
-export default function App() {
-  return (
-    <div>
-      <h1>Router Refresh</h1>
-      <p style={{ marginBottom: 12, color: '#666' }}>
-        Client state persists across server navigations
-      </p>
-      <Suspense fallback={<p>Loading...</p>}>
-        <Router initial={renderPage()} refreshAction={renderPage} />
-      </Suspense>
-    </div>
-  )
-}
-
-async function renderPage() {
-  'use server'
-  return <ColorTimer />
-}
-
-async function ColorTimer() {
-  await new Promise(r => setTimeout(r, 300))
-  const hue = Math.floor(Math.random() * 360)
-  return <Timer color={\`hsl(\${hue}, 70%, 85%)\`} />
-}`,
-    client: `'use client'
-
-import { useState, useEffect, useTransition, use } from 'react'
-
-export function Timer({ color }) {
-  const [seconds, setSeconds] = useState(0)
-
-  useEffect(() => {
-    const id = setInterval(() => setSeconds(s => s + 1), 1000)
-    return () => clearInterval(id)
-  }, [])
-
-  return (
-    <div style={{
-      background: color,
-      padding: 24,
-      borderRadius: 8,
-      textAlign: 'center'
-    }}>
-      <p style={{ fontFamily: 'monospace', fontSize: 32, margin: 0 }}>Timer: {seconds}s</p>
-    </div>
-  )
-}
-
-export function Router({ initial, refreshAction }) {
-  const [contentPromise, setContentPromise] = useState(initial)
-  const [isPending, startTransition] = useTransition()
-  const content = use(contentPromise)
-
-  const refresh = () => {
-    startTransition(() => {
-      setContentPromise(refreshAction())
-    })
-  }
-
-  return (
-    <div style={{ opacity: isPending ? 0.6 : 1, transition: 'opacity 0.2s' }}>
-      {content}
-      <button onClick={refresh} disabled={isPending} style={{ marginTop: 12 }}>
-        {isPending ? 'Refreshing...' : 'Refresh'}
-      </button>
-    </div>
-  )
 }`,
   },
   errors: {

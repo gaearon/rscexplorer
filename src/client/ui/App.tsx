@@ -84,11 +84,11 @@ function getInitialCode(): InitialCode {
     };
   }
 
-  const defaultSample = SAMPLES.pagination as Sample;
+  const defaultSample = SAMPLES.refresh as Sample;
   return {
     server: defaultSample.server,
     client: defaultSample.client,
-    sampleKey: "pagination",
+    sampleKey: "refresh",
   };
 }
 
