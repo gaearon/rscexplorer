@@ -78,6 +78,7 @@
 
 .LivePreview-slider {
   flex: 1;
+  min-width: 0;
   height: 4px;
   -webkit-appearance: none;
   appearance: none;
@@ -197,7 +198,6 @@
 }
 
 @media (max-width: 480px) {
-  .LivePreview-slider,
   .LivePreview-stepInfo {
     display: none;
   }
