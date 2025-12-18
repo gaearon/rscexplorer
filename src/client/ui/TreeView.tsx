@@ -29,7 +29,7 @@ function escapeHtml(str: string): string {
 }
 
 function PendingFallback(): React.ReactElement {
-  return <span className="PendingFallback">Pending</span>;
+  return <span className="TreeView-pending">Pending</span>;
 }
 
 type ErrorFallbackProps = {
@@ -38,7 +38,7 @@ type ErrorFallbackProps = {
 
 function ErrorFallback({ error }: ErrorFallbackProps): React.ReactElement {
   const message = error instanceof Error ? error.message : String(error);
-  return <span className="ErrorFallback">Error: {message}</span>;
+  return <span className="TreeView-error">Error: {message}</span>;
 }
 
 type ErrorBoundaryProps = {
@@ -114,27 +114,27 @@ type JSXValueProps = {
 
 // `ancestors` tracks the current path for cycle detection
 function JSXValue({ value, indent = 0, ancestors = [] }: JSXValueProps): React.ReactElement {
-  if (value === null) return <span className="JSXValue-null">null</span>;
-  if (value === undefined) return <span className="JSXValue-undefined">undefined</span>;
+  if (value === null) return <span className="TreeView-null">null</span>;
+  if (value === undefined) return <span className="TreeView-undefined">undefined</span>;
 
   if (typeof value === "string") {
     const display = value.length > 50 ? value.slice(0, 50) + "..." : value;
-    return <span className="JSXValue-string">"{escapeHtml(display)}"</span>;
+    return <span className="TreeView-string">"{escapeHtml(display)}"</span>;
   }
   if (typeof value === "number") {
     const display = Object.is(value, -0) ? "-0" : String(value);
-    return <span className="JSXValue-number">{display}</span>;
+    return <span className="TreeView-number">{display}</span>;
   }
   if (typeof value === "bigint") {
-    return <span className="JSXValue-number">{String(value)}n</span>;
+    return <span className="TreeView-number">{String(value)}n</span>;
   }
-  if (typeof value === "boolean") return <span className="JSXValue-boolean">{String(value)}</span>;
+  if (typeof value === "boolean") return <span className="TreeView-boolean">{String(value)}</span>;
   if (typeof value === "symbol") {
-    return <span className="JSXValue-symbol">{value.toString()}</span>;
+    return <span className="TreeView-symbol">{value.toString()}</span>;
   }
   if (typeof value === "function") {
     return (
-      <span className="JSXValue-function">
+      <span className="TreeView-function">
         [Function: {(value as { name?: string }).name || "anonymous"}]
       </span>
     );
@@ -142,7 +142,7 @@ function JSXValue({ value, indent = 0, ancestors = [] }: JSXValueProps): React.R
 
   if (typeof value === "object" && value !== null) {
     if (ancestors.includes(value)) {
-      return <span className="JSXValue-circular">[Circular]</span>;
+      return <span className="TreeView-circular">[Circular]</span>;
     }
   }
 
@@ -150,16 +150,16 @@ function JSXValue({ value, indent = 0, ancestors = [] }: JSXValueProps): React.R
     typeof value === "object" && value !== null ? [...ancestors, value] : ancestors;
 
   if (value instanceof Date) {
-    return <span className="JSXValue-date">Date({value.toISOString()})</span>;
+    return <span className="TreeView-date">Date({value.toISOString()})</span>;
   }
 
   if (value instanceof Map) {
-    if (value.size === 0) return <span className="JSXValue-collection">Map(0) {"{}"}</span>;
+    if (value.size === 0) return <span className="TreeView-collection">Map(0) {"{}"}</span>;
     const pad = "  ".repeat(indent + 1);
     const closePad = "  ".repeat(indent);
     return (
       <>
-        <span className="JSXValue-collection">
+        <span className="TreeView-collection">
           Map({value.size}) {"{\n"}
         </span>
         {Array.from(value.entries()).map(([k, v], i) => (
@@ -178,12 +178,12 @@ function JSXValue({ value, indent = 0, ancestors = [] }: JSXValueProps): React.R
   }
 
   if (value instanceof Set) {
-    if (value.size === 0) return <span className="JSXValue-collection">Set(0) {"{}"}</span>;
+    if (value.size === 0) return <span className="TreeView-collection">Set(0) {"{}"}</span>;
     const pad = "  ".repeat(indent + 1);
     const closePad = "  ".repeat(indent);
     return (
       <>
-        <span className="JSXValue-collection">
+        <span className="TreeView-collection">
           Set({value.size}) {"{\n"}
         </span>
         {Array.from(value).map((v, i) => (
@@ -202,16 +202,16 @@ function JSXValue({ value, indent = 0, ancestors = [] }: JSXValueProps): React.R
 
   if (value instanceof FormData) {
     const entries = Array.from(value.entries());
-    if (entries.length === 0) return <span className="JSXValue-collection">FormData {"{}"}</span>;
+    if (entries.length === 0) return <span className="TreeView-collection">FormData {"{}"}</span>;
     const pad = "  ".repeat(indent + 1);
     const closePad = "  ".repeat(indent);
     return (
       <>
-        <span className="JSXValue-collection">FormData {"{\n"}</span>
+        <span className="TreeView-collection">FormData {"{\n"}</span>
         {entries.map(([k, v], i) => (
           <React.Fragment key={i}>
             {pad}
-            <span className="JSXValue-key">{k}</span>:{" "}
+            <span className="TreeView-key">{k}</span>:{" "}
             <JSXValue value={v} indent={indent + 1} ancestors={nextAncestors} />
             {i < entries.length - 1 ? "," : ""}
             {"\n"}
@@ -225,7 +225,7 @@ function JSXValue({ value, indent = 0, ancestors = [] }: JSXValueProps): React.R
 
   if (value instanceof Blob) {
     return (
-      <span className="JSXValue-collection">
+      <span className="TreeView-collection">
         Blob({value.size} bytes, "{value.type || "application/octet-stream"}")
       </span>
     );
@@ -237,14 +237,14 @@ function JSXValue({ value, indent = 0, ancestors = [] }: JSXValueProps): React.R
     const preview = Array.from(arr.slice(0, 5)).join(", ");
     const suffix = arr.length > 5 ? ", ..." : "";
     return (
-      <span className="JSXValue-collection">
+      <span className="TreeView-collection">
         {name}({arr.length}) [{preview}
         {suffix}]
       </span>
     );
   }
   if (value instanceof ArrayBuffer) {
-    return <span className="JSXValue-collection">ArrayBuffer({value.byteLength} bytes)</span>;
+    return <span className="TreeView-collection">ArrayBuffer({value.byteLength} bytes)</span>;
   }
 
   if (Array.isArray(value)) {
@@ -253,7 +253,7 @@ function JSXValue({ value, indent = 0, ancestors = [] }: JSXValueProps): React.R
 
     const renderItem = (i: number): React.ReactElement => {
       if (!(i in value)) {
-        return <span className="JSXValue-empty">empty</span>;
+        return <span className="TreeView-empty">empty</span>;
       }
       return <JSXValue value={value[i]} indent={indent + 1} ancestors={nextAncestors} />;
     };
@@ -298,15 +298,15 @@ function JSXValue({ value, indent = 0, ancestors = [] }: JSXValueProps): React.R
     const obj = value as Record<string | symbol, unknown>;
 
     if (typeof obj.next === "function" && typeof obj[Symbol.iterator] === "function") {
-      return <span className="JSXValue-iterator">Iterator {"{}"}</span>;
+      return <span className="TreeView-iterator">Iterator {"{}"}</span>;
     }
 
     if (typeof obj[Symbol.asyncIterator] === "function") {
-      return <span className="JSXValue-iterator">AsyncIterator {"{}"}</span>;
+      return <span className="TreeView-iterator">AsyncIterator {"{}"}</span>;
     }
 
     if (value instanceof ReadableStream) {
-      return <span className="JSXValue-stream">ReadableStream {"{}"}</span>;
+      return <span className="TreeView-stream">ReadableStream {"{}"}</span>;
     }
 
     if (typeof obj.then === "function") {
@@ -341,7 +341,7 @@ function JSXValue({ value, indent = 0, ancestors = [] }: JSXValueProps): React.R
           {"{ "}
           {entries.map(([k, v], i) => (
             <React.Fragment key={k}>
-              <span className="JSXValue-key">{k}</span>:{" "}
+              <span className="TreeView-key">{k}</span>:{" "}
               <JSXValue value={v} indent={indent} ancestors={nextAncestors} />
               {i < entries.length - 1 ? ", " : ""}
             </React.Fragment>
@@ -358,7 +358,7 @@ function JSXValue({ value, indent = 0, ancestors = [] }: JSXValueProps): React.R
         {entries.map(([k, v], i) => (
           <React.Fragment key={k}>
             {pad}
-            <span className="JSXValue-key">{k}</span>:{" "}
+            <span className="TreeView-key">{k}</span>:{" "}
             <JSXValue value={v} indent={indent + 1} ancestors={nextAncestors} />
             {i < entries.length - 1 ? "," : ""}
             {"\n"}
@@ -370,7 +370,7 @@ function JSXValue({ value, indent = 0, ancestors = [] }: JSXValueProps): React.R
     );
   }
 
-  return <span className="JSXValue-unknown">{String(value)}</span>;
+  return <span className="TreeView-unknown">{String(value)}</span>;
 }
 
 type JSXElementProps = {
@@ -385,13 +385,13 @@ function JSXElement({ element, indent, ancestors = [] }: JSXElementProps): React
   const padInner = "  ".repeat(indent + 1);
 
   let tagName: string;
-  let tagClass = "JSXElement-tag";
+  let tagClass = "TreeView-tag";
   if (typeof type === "string") {
     tagName = type;
   } else if (typeof type === "function") {
     const funcType = type as { displayName?: string; name?: string };
     tagName = funcType.displayName || funcType.name || "Component";
-    tagClass = "JSXElement-clientTag";
+    tagClass = "TreeView-clientTag";
   } else if (typeof type === "symbol") {
     switch (type) {
       case Symbol.for("react.fragment"):
@@ -418,7 +418,7 @@ function JSXElement({ element, indent, ancestors = [] }: JSXElementProps): React
       default:
         tagName = "Unknown";
     }
-    tagClass = "JSXElement-reactTag";
+    tagClass = "TreeView-reactTag";
   } else if (type && typeof type === "object" && (type as { $$typeof?: symbol }).$$typeof) {
     const lazyType = type as ReactLazy;
     if (lazyType.$$typeof === Symbol.for("react.lazy")) {
@@ -435,7 +435,7 @@ function JSXElement({ element, indent, ancestors = [] }: JSXElementProps): React
       );
     }
     tagName = "Component";
-    tagClass = "JSXElement-clientTag";
+    tagClass = "TreeView-clientTag";
   } else {
     tagName = "Unknown";
   }
@@ -456,8 +456,8 @@ function JSXElement({ element, indent, ancestors = [] }: JSXElementProps): React
         {key != null && (
           <>
             {" "}
-            <span className="JSXElement-propName">key</span>=
-            <span className="JSXValue-string">"{key}"</span>
+            <span className="TreeView-propName">key</span>=
+            <span className="TreeView-string">"{key}"</span>
           </>
         )}
         {propEntries.map(([k, v]) => (
@@ -475,8 +475,8 @@ function JSXElement({ element, indent, ancestors = [] }: JSXElementProps): React
       {key != null && (
         <>
           {" "}
-          <span className="JSXElement-propName">key</span>=
-          <span className="JSXValue-string">"{key}"</span>
+          <span className="TreeView-propName">key</span>=
+          <span className="TreeView-string">"{key}"</span>
         </>
       )}
       {propEntries.map(([k, v]) => (
@@ -511,8 +511,8 @@ function JSXProp({ name, value, indent, ancestors = [] }: JSXPropProps): React.R
     return (
       <>
         {" "}
-        <span className="JSXElement-propName">{name}</span>=
-        <span className="JSXValue-string">"{escapeHtml(value)}"</span>
+        <span className="TreeView-propName">{name}</span>=
+        <span className="TreeView-string">"{escapeHtml(value)}"</span>
       </>
     );
   }
@@ -522,7 +522,7 @@ function JSXProp({ name, value, indent, ancestors = [] }: JSXPropProps): React.R
     return (
       <>
         {" "}
-        <span className="JSXElement-propName">{name}</span>={"{"}
+        <span className="TreeView-propName">{name}</span>={"{"}
         {"\n"}
         {pad}
         <JSXValue value={value} indent={indent} ancestors={ancestors} />
@@ -538,7 +538,7 @@ function JSXProp({ name, value, indent, ancestors = [] }: JSXPropProps): React.R
     return (
       <>
         {" "}
-        <span className="JSXElement-propName">{name}</span>={"{["}
+        <span className="TreeView-propName">{name}</span>={"{["}
         {"\n"}
         {value.map((v, i) => (
           <React.Fragment key={i}>
@@ -556,7 +556,7 @@ function JSXProp({ name, value, indent, ancestors = [] }: JSXPropProps): React.R
   return (
     <>
       {" "}
-      <span className="JSXElement-propName">{name}</span>={"{"}
+      <span className="TreeView-propName">{name}</span>={"{"}
       <JSXValue value={value} indent={indent} ancestors={ancestors} />
       {"}"}
     </>
@@ -609,12 +609,12 @@ export function FlightTreeView({
   flightPromise,
   inEntry,
 }: FlightTreeViewProps): React.ReactElement {
-  const className = inEntry ? "FlightTreeView FlightTreeView--inEntry" : "FlightTreeView";
+  const className = inEntry ? "TreeView TreeView--inEntry" : "TreeView";
 
   if (!flightPromise) {
     return (
       <div className={className}>
-        <pre className="FlightTreeView-output">
+        <pre className="TreeView-output">
           <PendingFallback />
         </pre>
       </div>
@@ -623,7 +623,7 @@ export function FlightTreeView({
 
   return (
     <div className={className}>
-      <pre className="FlightTreeView-output">
+      <pre className="TreeView-output">
         <ErrorBoundary>
           <Suspense fallback={<PendingFallback />}>
             <Await promise={flightPromise}>

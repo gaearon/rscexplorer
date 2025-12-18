@@ -12,45 +12,49 @@
   overflow: hidden;
 }
 
-.Workspace-pane {
+/* Grid positioning */
+
+.Workspace-server,
+.Workspace-client,
+.Workspace-flight,
+.Workspace-preview {
   display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
 }
 
-.Workspace-pane--server {
+.Workspace-server > *,
+.Workspace-client > *,
+.Workspace-flight > *,
+.Workspace-preview > * {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.Workspace-server {
   grid-area: server;
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
 
-.Workspace-pane--client {
+.Workspace-client {
   grid-area: client;
   border-right: 1px solid var(--border);
 }
 
-.Workspace-pane--flight {
+.Workspace-flight {
   grid-area: flight;
   border-bottom: 1px solid var(--border);
 }
 
-.Workspace-pane--preview {
+.Workspace-preview {
   grid-area: preview;
 }
 
-.Workspace-paneHeader {
-  padding: 6px 12px;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-dim);
-  flex-shrink: 0;
-  border-bottom: 1px solid var(--border);
-}
+/* Loading states */
 
-/* WorkspaceLoading states */
-
-.WorkspaceLoading-output {
+.Workspace-loadingOutput {
   flex: 1;
   min-height: 0;
   margin: 0;
@@ -65,7 +69,7 @@
   color: var(--text-dim);
 }
 
-.WorkspaceLoading-preview {
+.Workspace-loadingPreview {
   flex: 1;
   padding: 20px;
   background: #fff;
@@ -76,17 +80,50 @@
   line-height: 1.5;
 }
 
-.WorkspaceLoading-empty {
+.Workspace-loadingEmpty {
   color: var(--text-dim);
   font-style: italic;
 }
 
-.WorkspaceLoading-empty--waiting::after {
+.Workspace-loadingEmpty--waiting::after {
   content: "...";
-  animation: workspaceLoadingPulse 1.5s ease-in-out infinite;
+  animation: workspacePulse 1.5s ease-in-out infinite;
 }
 
-@keyframes workspaceLoadingPulse {
+/* Error states */
+
+.Workspace-errorOutput {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: var(--bg);
+  color: #e57373;
+}
+
+.Workspace-errorPreview {
+  flex: 1;
+  padding: 20px;
+  background: #fff;
+  color: #111;
+  overflow: auto;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.Workspace-errorMessage {
+  color: #c0392b;
+  font-style: italic;
+}
+
+@keyframes workspacePulse {
   0%,
   100% {
     opacity: 0.3;

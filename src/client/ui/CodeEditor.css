@@ -1,6 +1,6 @@
 /* CodeEditor component styles */
 
-.CodeEditor-container {
+.CodeEditor {
   flex: 1;
   min-height: 0;
   position: relative;
@@ -8,7 +8,7 @@
   background: var(--bg);
 }
 
-.CodeEditor-container .cm-editor {
+.CodeEditor .cm-editor {
   position: absolute !important;
   top: 0;
   left: 0;
@@ -18,6 +18,6 @@
   background: transparent;
 }
 
-.CodeEditor-container .cm-editor .cm-scroller {
+.CodeEditor .cm-editor .cm-scroller {
   overflow: auto !important;
 }

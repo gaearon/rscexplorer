@@ -5,6 +5,7 @@ import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
 import { tags } from "@lezer/highlight";
 import { history, historyKeymap, defaultKeymap } from "@codemirror/commands";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
+import { Pane } from "./Pane.tsx";
 import "./CodeEditor.css";
 
 const highlightStyle = HighlightStyle.define([
@@ -44,15 +45,9 @@ type CodeEditorProps = {
   defaultValue: string;
   onChange: (code: string) => void;
   label: string;
-  paneClass?: string;
 };
 
-export function CodeEditor({
-  defaultValue,
-  onChange,
-  label,
-  paneClass,
-}: CodeEditorProps): React.ReactElement {
+export function CodeEditor({ defaultValue, onChange, label }: CodeEditorProps): React.ReactElement {
   const [initialDefaultValue] = useState(defaultValue);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -87,9 +82,8 @@ export function CodeEditor({
   }, [initialDefaultValue]);
 
   return (
-    <div className={`Workspace-pane${paneClass ? ` ${paneClass}` : ""}`}>
-      <div className="Workspace-paneHeader">{label}</div>
-      <div className="CodeEditor-container" ref={containerRef} />
-    </div>
+    <Pane label={label}>
+      <div className="CodeEditor" ref={containerRef} />
+    </Pane>
   );
 }

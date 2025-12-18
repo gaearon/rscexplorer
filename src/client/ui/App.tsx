@@ -27,9 +27,9 @@ function BuildSwitcher(): React.ReactElement {
   };
 
   return (
-    <div className="BuildSwitcher">
-      <label className="BuildSwitcher-label">React</label>
-      <div className="BuildSwitcher-version">
+    <div className="App-buildSwitcher">
+      <label className="App-buildSwitcher-label">React</label>
+      <div className="App-buildSwitcher-version">
         <Select value={version} onChange={handleVersionChange} disabled={isDisabled}>
           {(REACT_VERSIONS as string[]).map((v) => (
             <option key={v} value={v}>
@@ -38,7 +38,7 @@ function BuildSwitcher(): React.ReactElement {
           ))}
         </Select>
       </div>
-      <div className="BuildSwitcher-mode">
+      <div className="App-buildSwitcher-mode">
         <Select value={isDev ? "dev" : "prod"} onChange={handleModeChange} disabled={isDisabled}>
           <option value="prod">prod</option>
           <option value="dev">dev</option>
@@ -142,26 +142,26 @@ ${code.client}
   };
 
   return (
-    <div className="EmbedModal-overlay" onClick={onClose}>
-      <div className="EmbedModal" onClick={(e: MouseEvent) => e.stopPropagation()}>
-        <div className="EmbedModal-header">
-          <h2 className="EmbedModal-title">Embed this example</h2>
-          <button className="EmbedModal-closeBtn" onClick={onClose}>
+    <div className="App-embedModal-overlay" onClick={onClose}>
+      <div className="App-embedModal" onClick={(e: MouseEvent) => e.stopPropagation()}>
+        <div className="App-embedModal-header">
+          <h2 className="App-embedModal-title">Embed this example</h2>
+          <button className="App-embedModal-closeBtn" onClick={onClose}>
             &times;
           </button>
         </div>
-        <div className="EmbedModal-body">
-          <p className="EmbedModal-description">Copy and paste this code into your HTML:</p>
+        <div className="App-embedModal-body">
+          <p className="App-embedModal-description">Copy and paste this code into your HTML:</p>
           <textarea
             ref={textareaRef}
-            className="EmbedModal-textarea"
+            className="App-embedModal-textarea"
             readOnly
             value={embedCode}
             onClick={(e) => (e.target as HTMLTextAreaElement).select()}
           />
         </div>
-        <div className="EmbedModal-footer">
-          <button className="EmbedModal-copyBtn" onClick={handleCopy}>
+        <div className="App-embedModal-footer">
+          <button className="App-embedModal-copyBtn" onClick={handleCopy}>
             {copied ? "Copied!" : "Copy to clipboard"}
           </button>
         </div>
@@ -249,9 +249,9 @@ export function App(): React.ReactElement {
     <>
       <header className="App-header">
         <h1 className="App-title">RSC Explorer</h1>
-        <div className="ExampleSelect">
-          <label className="ExampleSelect-label">Example</label>
-          <div className="ExampleSelect-selectWrapper">
+        <div className="App-exampleSelect">
+          <label className="App-exampleSelect-label">Example</label>
+          <div className="App-exampleSelect-selectWrapper">
             <Select value={currentSample ?? ""} onChange={handleSampleChange}>
               {!currentSample && <option value="">Custom</option>}
               {Object.entries(SAMPLES).map(([key, sample]) => (
@@ -262,7 +262,7 @@ export function App(): React.ReactElement {
             </Select>
           </div>
           <button
-            className="ExampleSelect-saveBtn"
+            className="App-exampleSelect-saveBtn"
             onClick={handleSave}
             disabled={!isDirty}
             title="Save to URL"
@@ -281,7 +281,7 @@ export function App(): React.ReactElement {
             </svg>
           </button>
           <button
-            className="ExampleSelect-embedBtn"
+            className="App-exampleSelect-embedBtn"
             onClick={() => setShowEmbedModal(true)}
             title="Embed"
           >

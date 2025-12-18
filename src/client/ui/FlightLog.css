@@ -48,9 +48,9 @@
   }
 }
 
-/* FlightLogEntry */
+/* FlightLog-entry */
 
-.FlightLogEntry {
+.FlightLog-entry {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -58,25 +58,25 @@
   border-left: 3px solid #555;
 }
 
-.FlightLogEntry + .FlightLogEntry {
+.FlightLog-entry + .FlightLog-entry {
   margin-top: 12px;
 }
 
-.FlightLogEntry--active {
+.FlightLog-entry--active {
   border-left-color: #ffd54f;
 }
 
-.FlightLogEntry--done {
+.FlightLog-entry--done {
   border-left-color: #555;
   opacity: 0.8;
 }
 
-.FlightLogEntry--pending {
+.FlightLog-entry--pending {
   border-left-color: #333;
   opacity: 0.4;
 }
 
-.FlightLogEntry-header {
+.FlightLog-entry-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -86,18 +86,18 @@
   border-bottom: 1px solid var(--border);
 }
 
-.FlightLogEntry-label {
+.FlightLog-entry-label {
   color: var(--text);
   font-weight: 500;
 }
 
-.FlightLogEntry-headerRight {
+.FlightLog-entry-headerRight {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.FlightLogEntry-deleteBtn {
+.FlightLog-entry-deleteBtn {
   background: transparent;
   border: none;
   color: var(--text-dim);
@@ -111,18 +111,18 @@
     color 0.15s;
 }
 
-.FlightLogEntry-deleteBtn:hover {
+.FlightLog-entry-deleteBtn:hover {
   opacity: 1;
   color: #e57373;
 }
 
-.FlightLogEntry-request {
+.FlightLog-entry-request {
   padding: 8px 10px;
   background: rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid var(--border);
 }
 
-.FlightLogEntry-requestArgs {
+.FlightLog-entry-requestArgs {
   margin: 0;
   font-family: var(--font-mono);
   font-size: 11px;
@@ -132,27 +132,27 @@
   word-break: break-all;
 }
 
-/* RenderLogView */
+/* FlightLog-renderView */
 
-.RenderLogView {
+.FlightLog-renderView {
   border-top: 1px solid var(--border);
   padding: 8px;
 }
 
-.RenderLogView-split {
+.FlightLog-renderView-split {
   display: flex;
   gap: 8px;
   align-items: stretch;
 }
 
-.RenderLogView-linesWrapper {
+.FlightLog-linesWrapper {
   flex: 1;
   min-width: 0;
   position: relative;
   min-height: 150px;
 }
 
-.RenderLogView-lines {
+.FlightLog-lines {
   position: absolute;
   top: 0;
   left: 0;
@@ -167,7 +167,7 @@
   overflow: auto;
 }
 
-.RenderLogView-line {
+.FlightLog-line {
   display: block;
   padding: 6px 8px;
   margin-bottom: 3px;
@@ -178,30 +178,30 @@
   transition: all 0.15s ease;
 }
 
-.RenderLogView-line:last-child {
+.FlightLog-line:last-child {
   margin-bottom: 0;
 }
 
-.RenderLogView-line--done {
+.FlightLog-line--done {
   color: #999;
   background: rgba(255, 255, 255, 0.03);
   border-left-color: #555;
 }
 
-.RenderLogView-line--next {
+.FlightLog-line--next {
   color: #e0e0e0;
   background: rgba(255, 213, 79, 0.12);
   border-left-color: #ffd54f;
 }
 
-.RenderLogView-line--pending {
+.FlightLog-line--pending {
   color: #444;
   background: transparent;
   border-left-color: #333;
   opacity: 0.4;
 }
 
-.RenderLogView-tree {
+.FlightLog-tree {
   flex: 1;
   min-width: 0;
   border-radius: 4px;
@@ -211,13 +211,13 @@
   flex-direction: column;
 }
 
-.RenderLogView-tree:has(.FlightTreeView) {
+.FlightLog-tree:has(.TreeView) {
   background: #000;
 }
 
-/* RawActionForm */
+/* FlightLog-rawForm */
 
-.RawActionForm {
+.FlightLog-rawForm {
   margin-top: 8px;
   padding: 10px;
   background: var(--surface);
@@ -228,7 +228,7 @@
   gap: 8px;
 }
 
-.RawActionForm-textarea {
+.FlightLog-rawForm-textarea {
   width: 100%;
   padding: 8px;
   background: var(--bg);
@@ -241,17 +241,17 @@
   min-height: 100px;
 }
 
-.RawActionForm-textarea:focus {
+.FlightLog-rawForm-textarea:focus {
   outline: none;
   border-color: #555;
 }
 
-.RawActionForm-buttons {
+.FlightLog-rawForm-buttons {
   display: flex;
   gap: 8px;
 }
 
-.RawActionForm-submitBtn {
+.FlightLog-rawForm-submitBtn {
   padding: 5px 12px;
   border-radius: 3px;
   font-size: 11px;
@@ -261,13 +261,13 @@
   color: #000;
 }
 
-.RawActionForm-submitBtn:disabled {
+.FlightLog-rawForm-submitBtn:disabled {
   background: #555;
   color: #888;
   cursor: not-allowed;
 }
 
-.RawActionForm-cancelBtn {
+.FlightLog-rawForm-cancelBtn {
   padding: 5px 12px;
   border-radius: 3px;
   font-size: 11px;
@@ -277,20 +277,20 @@
   color: var(--text-dim);
 }
 
-.RawActionForm-cancelBtn:hover {
+.FlightLog-rawForm-cancelBtn:hover {
   border-color: #555;
   color: var(--text);
 }
 
-/* AddActionButton */
+/* FlightLog-addButton */
 
-.AddActionButton-wrapper {
+.FlightLog-addButton-wrapper {
   display: flex;
   justify-content: center;
   margin-top: 8px;
 }
 
-.AddActionButton {
+.FlightLog-addButton {
   width: 24px;
   height: 24px;
   padding: 0;
@@ -304,7 +304,7 @@
   transition: all 0.15s;
 }
 
-.AddActionButton:hover {
+.FlightLog-addButton:hover {
   background: #3a3a3a;
   border-color: #666;
   color: var(--text);
@@ -313,7 +313,7 @@
 /* Responsive */
 
 @media (max-width: 768px) {
-  .RawActionForm-textarea {
+  .FlightLog-rawForm-textarea {
     font-size: 16px !important;
   }
 }

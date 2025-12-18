@@ -3,6 +3,7 @@ import { WorkspaceSession } from "../workspace-session.ts";
 import { CodeEditor } from "./CodeEditor.tsx";
 import { FlightLog } from "./FlightLog.tsx";
 import { LivePreview } from "./LivePreview.tsx";
+import { Pane } from "./Pane.tsx";
 import "./Workspace.css";
 
 type WorkspaceProps = {
@@ -49,18 +50,12 @@ export function Workspace({
 
   return (
     <main className="Workspace">
-      <CodeEditor
-        label="server"
-        defaultValue={serverCode}
-        onChange={handleServerChange}
-        paneClass="Workspace-pane--server"
-      />
-      <CodeEditor
-        label="client"
-        defaultValue={clientCode}
-        onChange={handleClientChange}
-        paneClass="Workspace-pane--client"
-      />
+      <div className="Workspace-server">
+        <CodeEditor label="server" defaultValue={serverCode} onChange={handleServerChange} />
+      </div>
+      <div className="Workspace-client">
+        <CodeEditor label="client" defaultValue={clientCode} onChange={handleClientChange} />
+      </div>
       {session ? (
         <WorkspaceContent session={session} onReset={reset} key={session.id} />
       ) : (
@@ -73,17 +68,23 @@ export function Workspace({
 function WorkspaceLoading(): React.ReactElement {
   return (
     <>
-      <div className="Workspace-pane Workspace-pane--flight">
-        <div className="Workspace-paneHeader">flight</div>
-        <div className="WorkspaceLoading-output">
-          <span className="WorkspaceLoading-empty WorkspaceLoading-empty--waiting">Compiling</span>
-        </div>
+      <div className="Workspace-flight">
+        <Pane label="flight">
+          <div className="Workspace-loadingOutput">
+            <span className="Workspace-loadingEmpty Workspace-loadingEmpty--waiting">
+              Compiling
+            </span>
+          </div>
+        </Pane>
       </div>
-      <div className="Workspace-pane Workspace-pane--preview">
-        <div className="Workspace-paneHeader">preview</div>
-        <div className="WorkspaceLoading-preview">
-          <span className="WorkspaceLoading-empty WorkspaceLoading-empty--waiting">Compiling</span>
-        </div>
+      <div className="Workspace-preview">
+        <Pane label="preview">
+          <div className="Workspace-loadingPreview">
+            <span className="Workspace-loadingEmpty Workspace-loadingEmpty--waiting">
+              Compiling
+            </span>
+          </div>
+        </Pane>
       </div>
     </>
   );
@@ -103,15 +104,17 @@ function WorkspaceContent({ session, onReset }: WorkspaceContentProps): React.Re
   if (session.state.status === "error") {
     return (
       <>
-        <div className="Workspace-pane Workspace-pane--flight">
-          <div className="Workspace-paneHeader">flight</div>
-          <pre className="FlightLog-output FlightLog-output--error">{session.state.message}</pre>
+        <div className="Workspace-flight">
+          <Pane label="flight">
+            <pre className="Workspace-errorOutput">{session.state.message}</pre>
+          </Pane>
         </div>
-        <div className="Workspace-pane Workspace-pane--preview">
-          <div className="Workspace-paneHeader">preview</div>
-          <div className="LivePreview-container">
-            <span className="LivePreview-empty LivePreview-empty--error">Compilation error</span>
-          </div>
+        <div className="Workspace-preview">
+          <Pane label="preview">
+            <div className="Workspace-errorPreview">
+              <span className="Workspace-errorMessage">Compilation error</span>
+            </div>
+          </Pane>
         </div>
       </>
     );
@@ -121,26 +124,29 @@ function WorkspaceContent({ session, onReset }: WorkspaceContentProps): React.Re
 
   return (
     <>
-      <div className="Workspace-pane Workspace-pane--flight">
-        <div className="Workspace-paneHeader">flight</div>
-        <FlightLog
+      <div className="Workspace-flight">
+        <Pane label="flight">
+          <FlightLog
+            entries={entries}
+            cursor={cursor}
+            availableActions={availableActions}
+            onAddRawAction={(name, payload) => session.addRawAction(name, payload)}
+            onDeleteEntry={(idx) => session.timeline.deleteEntry(idx)}
+          />
+        </Pane>
+      </div>
+      <div className="Workspace-preview">
+        <LivePreview
           entries={entries}
           cursor={cursor}
-          availableActions={availableActions}
-          onAddRawAction={(name, payload) => session.addRawAction(name, payload)}
-          onDeleteEntry={(idx) => session.timeline.deleteEntry(idx)}
+          totalChunks={totalChunks}
+          isAtStart={isAtStart}
+          isAtEnd={isAtEnd}
+          onStep={() => session.timeline.stepForward()}
+          onSkip={() => session.timeline.skipToEntryEnd()}
+          onReset={onReset}
         />
       </div>
-      <LivePreview
-        entries={entries}
-        cursor={cursor}
-        totalChunks={totalChunks}
-        isAtStart={isAtStart}
-        isAtEnd={isAtEnd}
-        onStep={() => session.timeline.stepForward()}
-        onSkip={() => session.timeline.skipToEntryEnd()}
-        onReset={onReset}
-      />
     </>
   );
 }

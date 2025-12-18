@@ -1,5 +1,6 @@
 import React, { Suspense, Component, useState, useEffect, type ReactNode } from "react";
 import type { EntryView, Thenable } from "../runtime/index.ts";
+import { Pane } from "./Pane.tsx";
 import "./LivePreview.css";
 
 type PreviewErrorBoundaryProps = {
@@ -107,8 +108,7 @@ export function LivePreview({
   }
 
   return (
-    <div className="Workspace-pane Workspace-pane--preview">
-      <div className="Workspace-paneHeader">preview</div>
+    <Pane label="preview">
       <div className="LivePreview-playback">
         <div className="LivePreview-controls">
           <button
@@ -187,6 +187,6 @@ export function LivePreview({
           </PreviewErrorBoundary>
         ) : null}
       </div>
-    </div>
+    </Pane>
   );
 }

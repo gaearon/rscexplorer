@@ -1,6 +1,6 @@
 /* TreeView component styles */
 
-.FlightTreeView {
+.TreeView {
   flex: 1;
   min-height: 0;
   padding: 12px;
@@ -11,22 +11,22 @@
   background: var(--bg);
 }
 
-.FlightTreeView--inEntry {
+.TreeView--inEntry {
   padding: 8px;
   font-size: 11px;
   line-height: 1.6;
 }
 
-.FlightTreeView-output {
+.TreeView-output {
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
   color: var(--text);
 }
 
-/* PendingFallback */
+/* TreeView-pending */
 
-.PendingFallback {
+.TreeView-pending {
   display: inline-block;
   color: #64b5f6;
   background: rgba(100, 181, 246, 0.15);
@@ -36,10 +36,10 @@
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.5px;
-  animation: pendingPulse 2s ease-in-out infinite;
+  animation: treeViewPendingPulse 2s ease-in-out infinite;
 }
 
-@keyframes pendingPulse {
+@keyframes treeViewPendingPulse {
   0%,
   100% {
     opacity: 0.7;
@@ -49,9 +49,9 @@
   }
 }
 
-/* ErrorFallback */
+/* TreeView-error */
 
-.ErrorFallback {
+.TreeView-error {
   display: inline-block;
   color: #e57373;
   background: rgba(229, 115, 115, 0.15);
@@ -63,94 +63,94 @@
   letter-spacing: 0.5px;
 }
 
-/* JSXValue types */
+/* TreeView value types */
 
-.JSXValue-null {
+.TreeView-null {
   color: #5c6370;
   font-style: italic;
 }
 
-.JSXValue-undefined {
+.TreeView-undefined {
   color: #5c6370;
   font-style: italic;
 }
 
-.JSXValue-string {
+.TreeView-string {
   color: #98c379;
 }
 
-.JSXValue-number {
+.TreeView-number {
   color: #d19a66;
 }
 
-.JSXValue-boolean {
+.TreeView-boolean {
   color: #56b6c2;
 }
 
-.JSXValue-symbol {
+.TreeView-symbol {
   color: #c678dd;
 }
 
-.JSXValue-function {
+.TreeView-function {
   color: #61afef;
   font-style: italic;
 }
 
-.JSXValue-circular {
+.TreeView-circular {
   color: #e57373;
   font-style: italic;
 }
 
-.JSXValue-date {
+.TreeView-date {
   color: #e5c07b;
 }
 
-.JSXValue-collection {
+.TreeView-collection {
   color: var(--text-dim);
 }
 
-.JSXValue-iterator {
-  color: var(--text-dim);
-  font-style: italic;
-}
-
-.JSXValue-stream {
+.TreeView-iterator {
   color: var(--text-dim);
   font-style: italic;
 }
 
-.JSXValue-key {
+.TreeView-stream {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.TreeView-key {
   color: #61afef;
 }
 
-.JSXValue-empty {
+.TreeView-empty {
   color: #5c6370;
   font-style: italic;
 }
 
-.JSXValue-unknown {
+.TreeView-unknown {
   color: var(--text-dim);
 }
 
-/* JSXElement */
+/* TreeView element */
 
-.JSXElement-tag {
+.TreeView-tag {
   color: #e06c75;
 }
 
-.JSXElement-clientTag {
+.TreeView-clientTag {
   color: #c678dd;
 }
 
-.JSXElement-reactTag {
+.TreeView-reactTag {
   color: #e5c07b;
 }
 
-.JSXElement-propName {
+.TreeView-propName {
   color: #61afef;
 }
 
-.JSXElement-children {
+.TreeView-children {
   margin-left: 16px;
   border-left: 1px solid #333;
   padding-left: 12px;

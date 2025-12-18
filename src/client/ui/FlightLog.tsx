@@ -30,30 +30,30 @@ function RenderLogView({ entry, cursor }: RenderLogViewProps): React.ReactElemen
 
   const getLineClass = (i: number): string => {
     const globalChunk = chunkStart + i;
-    if (globalChunk < cursor) return "RenderLogView-line--done";
-    if (globalChunk === cursor) return "RenderLogView-line--next";
-    return "RenderLogView-line--pending";
+    if (globalChunk < cursor) return "FlightLog-line--done";
+    if (globalChunk === cursor) return "FlightLog-line--next";
+    return "FlightLog-line--pending";
   };
 
   const showTree = cursor >= chunkStart;
 
   return (
-    <div className="RenderLogView">
-      <div className="RenderLogView-split">
-        <div className="RenderLogView-linesWrapper">
-          <pre className="RenderLogView-lines">
+    <div className="FlightLog-renderView">
+      <div className="FlightLog-renderView-split">
+        <div className="FlightLog-linesWrapper">
+          <pre className="FlightLog-lines">
             {rows.map((line, i) => (
               <span
                 key={i}
                 ref={i === nextLineIndex ? activeRef : null}
-                className={`RenderLogView-line ${getLineClass(i)}`}
+                className={`FlightLog-line ${getLineClass(i)}`}
               >
                 {escapeHtml(line)}
               </span>
             ))}
           </pre>
         </div>
-        <div className="RenderLogView-tree">
+        <div className="FlightLog-tree">
           {showTree && <FlightTreeView flightPromise={flightPromise ?? null} inEntry />}
         </div>
       </div>
@@ -75,21 +75,21 @@ function FlightLogEntry({
   onDelete,
 }: FlightLogEntryProps): React.ReactElement {
   const modifierClass = entry.isActive
-    ? "FlightLogEntry--active"
+    ? "FlightLog-entry--active"
     : entry.isDone
-      ? "FlightLogEntry--done"
-      : "FlightLogEntry--pending";
+      ? "FlightLog-entry--done"
+      : "FlightLog-entry--pending";
 
   return (
-    <div className={`FlightLogEntry ${modifierClass}`}>
-      <div className="FlightLogEntry-header">
-        <span className="FlightLogEntry-label">
+    <div className={`FlightLog-entry ${modifierClass}`}>
+      <div className="FlightLog-entry-header">
+        <span className="FlightLog-entry-label">
           {entry.type === "render" ? "Render" : `Action: ${entry.name}`}
         </span>
-        <span className="FlightLogEntry-headerRight">
+        <span className="FlightLog-entry-headerRight">
           {entry.canDelete && (
             <button
-              className="FlightLogEntry-deleteBtn"
+              className="FlightLog-entry-deleteBtn"
               onClick={() => onDelete(index)}
               title="Delete"
             >
@@ -99,8 +99,8 @@ function FlightLogEntry({
         </span>
       </div>
       {entry.type === "action" && entry.args && (
-        <div className="FlightLogEntry-request">
-          <pre className="FlightLogEntry-requestArgs">{entry.args}</pre>
+        <div className="FlightLog-entry-request">
+          <pre className="FlightLog-entry-requestArgs">{entry.args}</pre>
         </div>
       )}
       <RenderLogView entry={entry} cursor={cursor} />
@@ -157,7 +157,7 @@ export function FlightLog({
       ))}
       {availableActions.length > 0 &&
         (showRawInput ? (
-          <div className="RawActionForm">
+          <div className="FlightLog-rawForm">
             <Select value={selectedAction} onChange={(e) => setSelectedAction(e.target.value)}>
               {availableActions.map((action) => (
                 <option key={action} value={action}>
@@ -169,25 +169,28 @@ export function FlightLog({
               placeholder="Paste a request payload from a real action"
               value={rawPayload}
               onChange={(e) => setRawPayload(e.target.value)}
-              className="RawActionForm-textarea"
+              className="FlightLog-rawForm-textarea"
               rows={6}
             />
-            <div className="RawActionForm-buttons">
+            <div className="FlightLog-rawForm-buttons">
               <button
-                className="RawActionForm-submitBtn"
+                className="FlightLog-rawForm-submitBtn"
                 onClick={handleAddRaw}
                 disabled={!rawPayload.trim()}
               >
                 Add
               </button>
-              <button className="RawActionForm-cancelBtn" onClick={() => setShowRawInput(false)}>
+              <button
+                className="FlightLog-rawForm-cancelBtn"
+                onClick={() => setShowRawInput(false)}
+              >
                 Cancel
               </button>
             </div>
           </div>
         ) : (
-          <div className="AddActionButton-wrapper">
-            <button className="AddActionButton" onClick={handleShowRawInput} title="Add action">
+          <div className="FlightLog-addButton-wrapper">
+            <button className="FlightLog-addButton" onClick={handleShowRawInput} title="Add action">
               +
             </button>
           </div>
