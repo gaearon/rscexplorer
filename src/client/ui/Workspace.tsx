@@ -21,6 +21,7 @@ export function Workspace({
   const [clientCode, setClientCode] = useState(initialClientCode);
   const [resetKey, setResetKey] = useState(0);
   const [session, setSession] = useState<WorkspaceSession | null>(null);
+  const [autoSkip, setAutoSkip] = useState<boolean>(false);
 
   useEffect(() => {
     const abort = new AbortController();
@@ -50,10 +51,16 @@ export function Workspace({
   }
 
   function reset() {
+    setAutoSkip(false);
     setResetKey((k) => k + 1);
   }
 
   const timeline = session?.timeline ?? loadingTimeline;
+
+  useEffect(() => {
+    session?.setAutoSkip(autoSkip);
+  }, [autoSkip]);
+
   const { entries, cursor, totalChunks, isAtStart, isAtEnd } = useSyncExternalStore(
     timeline.subscribe,
     timeline.getSnapshot,
@@ -102,6 +109,8 @@ export function Workspace({
           onStep={timeline.stepForward}
           onSkip={timeline.skipToEntryEnd}
           onReset={reset}
+          autoSkip={autoSkip}
+          setAutoSkip={setAutoSkip}
         />
       </div>
     </main>

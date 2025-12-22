@@ -51,6 +51,8 @@ type LivePreviewProps = {
   onStep: () => void;
   onSkip: () => void;
   onReset: () => void;
+  autoSkip: boolean;
+  setAutoSkip: (enabled: boolean) => void;
 };
 
 export function LivePreview({
@@ -63,6 +65,8 @@ export function LivePreview({
   onStep,
   onSkip,
   onReset,
+  autoSkip,
+  setAutoSkip,
 }: LivePreviewProps): React.ReactElement {
   const renderEntry = entries[0];
   const flightPromise = renderEntry?.flightPromise;
@@ -204,6 +208,22 @@ export function LivePreview({
         >
           {statusText}
         </span>
+      </div>
+      <div>
+        <label id="autoSkip">
+          <input
+            aria-label="autoSkip"
+            type="checkbox"
+            checked={autoSkip}
+            onChange={(e) => {
+              if (e.target.checked) {
+                handleSkip();
+              }
+              setAutoSkip(e.target.checked);
+            }}
+          />
+          Auto Skip
+        </label>
       </div>
       <div className="LivePreview-container" data-testid="preview-container">
         {isLoading ? (

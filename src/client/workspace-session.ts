@@ -28,6 +28,7 @@ export const loadingTimeline = {
   getSnapshot: () => emptySnapshot,
   stepForward: () => {},
   skipToEntryEnd: () => {},
+  setAutoSkip: () => {},
 };
 
 export class WorkspaceSession {
@@ -35,6 +36,7 @@ export class WorkspaceSession {
   readonly state: SessionState;
   readonly id: number = lastId++;
   private worker: WorkerClient;
+  private autoSkip: boolean = false;
 
   private constructor(worker: WorkerClient, state: SessionState) {
     this.worker = worker;
@@ -104,6 +106,9 @@ export class WorkspaceSession {
       stream = SteppableStream.fromError(error);
     }
     this.timeline.addAction(actionName, argsDisplay, stream);
+    if (this.autoSkip) {
+      this.timeline.skipToEntryEnd();
+    }
     if (stream.error) {
       throw stream.error;
     }
@@ -123,5 +128,9 @@ export class WorkspaceSession {
 
   addRawAction = async (actionName: string, rawPayload: string): Promise<void> => {
     await this.runAction(actionName, { type: "formdata", data: rawPayload }, rawPayload);
+  };
+
+  setAutoSkip = (enabled: boolean): void => {
+    this.autoSkip = enabled;
   };
 }
