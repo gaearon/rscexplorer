@@ -138,6 +138,10 @@
   white-space: nowrap;
 }
 
+.LivePreview-subcontrols {
+  padding: 8px 12px;
+}
+
 .LivePreview-container {
   flex: 1;
   padding: 20px;

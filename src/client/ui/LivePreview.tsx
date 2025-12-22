@@ -209,7 +209,7 @@ export function LivePreview({
           {statusText}
         </span>
       </div>
-      <div>
+      <div className="LivePreview-subcontrols">
         <label id="autoSkip">
           <input
             aria-label="autoSkip"
