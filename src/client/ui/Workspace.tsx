@@ -59,7 +59,7 @@ export function Workspace({
 
   useEffect(() => {
     session?.setAutoSkip(autoSkip);
-  }, [autoSkip]);
+  }, [session, autoSkip]);
 
   const { entries, cursor, totalChunks, isAtStart, isAtEnd } = useSyncExternalStore(
     timeline.subscribe,
