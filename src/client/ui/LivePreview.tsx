@@ -152,7 +152,7 @@ export function LivePreview({
             )}
           </button>
           <button
-            className={`LivePreview-controlBtn${!isLoading && !isAtEnd ? " LivePreview-controlBtn--step" : ""}`}
+            className={`LivePreview-controlBtn${!isLoading && !isAtEnd && !isPlaying ? " LivePreview-controlBtn--step" : ""}`}
             onClick={handleStep}
             disabled={isLoading || isAtEnd}
             aria-label="Step forward"
