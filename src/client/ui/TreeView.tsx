@@ -448,11 +448,39 @@ function JSXElement({ element, indent, ancestors = [] }: JSXElementProps): React
     ([k]) => !["key", "ref", "__self", "__source"].includes(k),
   );
 
+  const totalProps = propEntries.length + (key != null ? 1 : 0);
+  const multiline = totalProps >= 2;
+
   if (
     children === undefined ||
     children === null ||
     (Array.isArray(children) && children.length === 0)
   ) {
+    if (multiline) {
+      return (
+        <>
+          <span className={tagClass}>&lt;{tagName}</span>
+          {key != null && (
+            <>
+              {"\n"}
+              {padInner}
+              <span className="TreeView-propName">key</span>=
+              <span className="TreeView-string">"{key}"</span>
+            </>
+          )}
+          {propEntries.map(([k, v]) => (
+            <React.Fragment key={k}>
+              {"\n"}
+              {padInner}
+              <JSXProp name={k} value={v} indent={indent + 1} ancestors={ancestors} />
+            </React.Fragment>
+          ))}
+          {"\n"}
+          {pad}
+          <span className={tagClass}>/&gt;</span>
+        </>
+      );
+    }
     return (
       <>
         <span className={tagClass}>&lt;{tagName}</span>
@@ -464,7 +492,10 @@ function JSXElement({ element, indent, ancestors = [] }: JSXElementProps): React
           </>
         )}
         {propEntries.map(([k, v]) => (
-          <JSXProp key={k} name={k} value={v} indent={indent + 1} ancestors={ancestors} />
+          <React.Fragment key={k}>
+            {" "}
+            <JSXProp name={k} value={v} indent={indent} ancestors={ancestors} />
+          </React.Fragment>
         ))}
         <span className={tagClass}> /&gt;</span>
       </>
@@ -472,6 +503,45 @@ function JSXElement({ element, indent, ancestors = [] }: JSXElementProps): React
   }
 
   const hasComplexChildren = typeof children !== "string" && typeof children !== "number";
+
+  if (multiline) {
+    return (
+      <>
+        <span className={tagClass}>&lt;{tagName}</span>
+        {key != null && (
+          <>
+            {"\n"}
+            {padInner}
+            <span className="TreeView-propName">key</span>=
+            <span className="TreeView-string">"{key}"</span>
+          </>
+        )}
+        {propEntries.map(([k, v]) => (
+          <React.Fragment key={k}>
+            {"\n"}
+            {padInner}
+            <JSXProp name={k} value={v} indent={indent + 1} ancestors={ancestors} />
+          </React.Fragment>
+        ))}
+        {"\n"}
+        {pad}
+        <span className={tagClass}>&gt;</span>
+        {hasComplexChildren ? (
+          <>
+            {"\n"}
+            {padInner}
+            <JSXChildren value={children} indent={indent + 1} ancestors={ancestors} />
+            {"\n"}
+            {pad}
+          </>
+        ) : (
+          <JSXChildren value={children} indent={indent + 1} ancestors={ancestors} />
+        )}
+        <span className={tagClass}>&lt;/{tagName}&gt;</span>
+      </>
+    );
+  }
+
   return (
     <>
       <span className={tagClass}>&lt;{tagName}</span>
@@ -483,7 +553,10 @@ function JSXElement({ element, indent, ancestors = [] }: JSXElementProps): React
         </>
       )}
       {propEntries.map(([k, v]) => (
-        <JSXProp key={k} name={k} value={v} indent={indent + 1} ancestors={ancestors} />
+        <React.Fragment key={k}>
+          {" "}
+          <JSXProp name={k} value={v} indent={indent} ancestors={ancestors} />
+        </React.Fragment>
       ))}
       <span className={tagClass}>&gt;</span>
       {hasComplexChildren ? (
@@ -513,22 +586,20 @@ function JSXProp({ name, value, indent, ancestors = [] }: JSXPropProps): React.R
   if (typeof value === "string") {
     return (
       <>
-        {" "}
         <span className="TreeView-propName">{name}</span>=
         <span className="TreeView-string">"{escapeHtml(value)}"</span>
       </>
     );
   }
   if (isReactElement(value)) {
-    const pad = "  ".repeat(indent);
-    const closePad = "  ".repeat(indent - 1);
+    const innerPad = "  ".repeat(indent + 1);
+    const closePad = "  ".repeat(indent);
     return (
       <>
-        {" "}
         <span className="TreeView-propName">{name}</span>={"{"}
         {"\n"}
-        {pad}
-        <JSXValue value={value} indent={indent} ancestors={ancestors} />
+        {innerPad}
+        <JSXValue value={value} indent={indent + 1} ancestors={ancestors} />
         {"\n"}
         {closePad}
         {"}"}
@@ -536,17 +607,16 @@ function JSXProp({ name, value, indent, ancestors = [] }: JSXPropProps): React.R
     );
   }
   if (Array.isArray(value) && value.some((v) => isReactElement(v))) {
-    const pad = "  ".repeat(indent);
-    const closePad = "  ".repeat(indent - 1);
+    const itemPad = "  ".repeat(indent + 1);
+    const closePad = "  ".repeat(indent);
     return (
       <>
-        {" "}
         <span className="TreeView-propName">{name}</span>={"{["}
         {"\n"}
         {value.map((v, i) => (
           <React.Fragment key={i}>
-            {pad}
-            <JSXValue value={v} indent={indent} ancestors={ancestors} />
+            {itemPad}
+            <JSXValue value={v} indent={indent + 1} ancestors={ancestors} />
             {i < value.length - 1 ? "," : ""}
             {"\n"}
           </React.Fragment>
@@ -558,7 +628,6 @@ function JSXProp({ name, value, indent, ancestors = [] }: JSXPropProps): React.R
   }
   return (
     <>
-      {" "}
       <span className="TreeView-propName">{name}</span>={"{"}
       <JSXValue value={value} indent={indent} ancestors={ancestors} />
       {"}"}

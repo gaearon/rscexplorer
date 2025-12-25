@@ -49,38 +49,48 @@ test("pagination sample", async () => {
       <Suspense fallback={
         <p style={{ color: "#888" }}>Loading recipes...</p>
       }>
-        <Paginator initialItems={[
-          <div key="1" style={{
-              padding: 12,
-              marginBottom: 8,
-              background: "#f5f5f5",
-              borderRadius: 6
-            }}>
-            <strong>Pasta Carbonara</strong>
-            <p style={{
+        <Paginator
+          initialItems={[
+            <div
+              key="1"
+              style={{
+                padding: 12,
+                marginBottom: 8,
+                background: "#f5f5f5",
+                borderRadius: 6
+              }}
+            >
+              <strong>Pasta Carbonara</strong>
+              <p style={{
                 margin: "4px 0 0",
                 color: "#666",
                 fontSize: 13
               }}>
-              25 min · Medium
-            </p>
-          </div>,
-          <div key="2" style={{
-              padding: 12,
-              marginBottom: 8,
-              background: "#f5f5f5",
-              borderRadius: 6
-            }}>
-            <strong>Grilled Cheese</strong>
-            <p style={{
+                25 min · Medium
+              </p>
+            </div>,
+            <div
+              key="2"
+              style={{
+                padding: 12,
+                marginBottom: 8,
+                background: "#f5f5f5",
+                borderRadius: 6
+              }}
+            >
+              <strong>Grilled Cheese</strong>
+              <p style={{
                 margin: "4px 0 0",
                 color: "#666",
                 fontSize: 13
               }}>
-              10 min · Easy
-            </p>
-          </div>
-        ]} initialCursor={2} loadMoreAction={[Function: loadMore]} />
+                10 min · Easy
+              </p>
+            </div>
+          ]}
+          initialCursor={2}
+          loadMoreAction={[Function: loadMore]}
+        />
       </Suspense>
     </div>"
   `);
@@ -120,33 +130,39 @@ test("pagination sample", async () => {
   expect(await h.stepAll()).toMatchInlineSnapshot(`
     "{
       newItems: [
-        <div key="3" style={{
+        <div
+          key="3"
+          style={{
             padding: 12,
             marginBottom: 8,
             background: "#f5f5f5",
             borderRadius: 6
-          }}>
+          }}
+        >
           <strong>Chicken Stir Fry</strong>
           <p style={{
-              margin: "4px 0 0",
-              color: "#666",
-              fontSize: 13
-            }}>
+            margin: "4px 0 0",
+            color: "#666",
+            fontSize: 13
+          }}>
             20 min · Easy
           </p>
         </div>,
-        <div key="4" style={{
+        <div
+          key="4"
+          style={{
             padding: 12,
             marginBottom: 8,
             background: "#f5f5f5",
             borderRadius: 6
-          }}>
+          }}
+        >
           <strong>Beef Tacos</strong>
           <p style={{
-              margin: "4px 0 0",
-              color: "#666",
-              fontSize: 13
-            }}>
+            margin: "4px 0 0",
+            color: "#666",
+            fontSize: 13
+          }}>
             30 min · Medium
           </p>
         </div>
@@ -207,33 +223,39 @@ test("pagination sample", async () => {
   expect(await h.stepAll()).toMatchInlineSnapshot(`
     "{
       newItems: [
-        <div key="5" style={{
+        <div
+          key="5"
+          style={{
             padding: 12,
             marginBottom: 8,
             background: "#f5f5f5",
             borderRadius: 6
-          }}>
+          }}
+        >
           <strong>Caesar Salad</strong>
           <p style={{
-              margin: "4px 0 0",
-              color: "#666",
-              fontSize: 13
-            }}>
+            margin: "4px 0 0",
+            color: "#666",
+            fontSize: 13
+          }}>
             15 min · Easy
           </p>
         </div>,
-        <div key="6" style={{
+        <div
+          key="6"
+          style={{
             padding: 12,
             marginBottom: 8,
             background: "#f5f5f5",
             borderRadius: 6
-          }}>
+          }}
+        >
           <strong>Mushroom Risotto</strong>
           <p style={{
-              margin: "4px 0 0",
-              color: "#666",
-              fontSize: 13
-            }}>
+            margin: "4px 0 0",
+            color: "#666",
+            fontSize: 13
+          }}>
             45 min · Hard
           </p>
         </div>

@@ -31,7 +31,10 @@ test("refresh sample - renders router with async content", async () => {
       <Suspense fallback={
         <p>Loading...</p>
       }>
-        <Router initial={Pending} refreshAction={[Function: renderPage]} />
+        <Router
+          initial={Pending}
+          refreshAction={[Function: renderPage]}
+        />
       </Suspense>
     </div>"
   `);

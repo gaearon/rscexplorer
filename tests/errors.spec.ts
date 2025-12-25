@@ -29,11 +29,11 @@ test("errors sample - error boundary catches thrown error", async () => {
       <h1>Error Handling</h1>
       <ErrorBoundary fallback={
         <div style={{
-            padding: 16,
-            background: "#fee",
-            borderRadius: 8,
-            color: "#c00"
-          }}>
+          padding: 16,
+          background: "#fee",
+          borderRadius: 8,
+          color: "#c00"
+        }}>
           <strong>Failed to load user</strong>
           <p style={{ margin: "4px 0 0" }}>Please try again later.</p>
         </div>
@@ -58,11 +58,11 @@ test("errors sample - error boundary catches thrown error", async () => {
       <h1>Error Handling</h1>
       <ErrorBoundary fallback={
         <div style={{
-            padding: 16,
-            background: "#fee",
-            borderRadius: 8,
-            color: "#c00"
-          }}>
+          padding: 16,
+          background: "#fee",
+          borderRadius: 8,
+          color: "#c00"
+        }}>
           <strong>Failed to load user</strong>
           <p style={{ margin: "4px 0 0" }}>Please try again later.</p>
         </div>

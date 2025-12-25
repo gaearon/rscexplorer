@@ -52,95 +52,95 @@ test("kitchensink sample - renders all RSC protocol types", async () => {
         <p>Loading...</p>
       }>
         <DataDisplay data={{
-            primitives: {
-              null: null,
-              true: true,
-              false: false,
-              int: 42,
-              float: 3.14159,
-              string: "hello world",
-              empty: "",
-              dollar: "$special",
-              unicode: "Hello 世界 🌍"
+          primitives: {
+            null: null,
+            true: true,
+            false: false,
+            int: 42,
+            float: 3.14159,
+            string: "hello world",
+            empty: "",
+            dollar: "$special",
+            unicode: "Hello 世界 🌍"
+          },
+          special: {
+            negZero: -0,
+            inf: Infinity,
+            negInf: -Infinity,
+            nan: NaN
+          },
+          types: {
+            date: Date(2024-01-15T12:00:00.000Z),
+            bigint: 12345678901234567890n,
+            symbol: Symbol(mySymbol)
+          },
+          binary: {
+            uint8: Uint8Array(5) [1, 2, 3, 4, 5],
+            int32: Int32Array(3) [-1, 0, 2147483647],
+            float64: Float64Array(2) [3.14159, 2.71828]
+          },
+          collections: {
+            map: Map(2) {
+              "a" => 1,
+              "b" => { nested: true }
             },
-            special: {
-              negZero: -0,
-              inf: Infinity,
-              negInf: -Infinity,
-              nan: NaN
+            set: Set(3) {
+              1,
+              2,
+              "three"
             },
-            types: {
-              date: Date(2024-01-15T12:00:00.000Z),
-              bigint: 12345678901234567890n,
-              symbol: Symbol(mySymbol)
+            formData: FormData {
+              key: "value"
             },
-            binary: {
-              uint8: Uint8Array(5) [1, 2, 3, 4, 5],
-              int32: Int32Array(3) [-1, 0, 2147483647],
-              float64: Float64Array(2) [3.14159, 2.71828]
-            },
-            collections: {
-              map: Map(2) {
-                "a" => 1,
-                "b" => { nested: true }
-              },
-              set: Set(3) {
-                1,
-                2,
-                "three"
-              },
-              formData: FormData {
-                key: "value"
-              },
-              blob: Blob(5 bytes, "text/plain")
-            },
-            arrays: {
-              simple: [1, 2, 3],
-              sparse: [
-                1,
-                empty,
-                empty,
-                4
-              ],
-              nested: [[1], [2, [3]]]
-            },
-            objects: {
-              simple: { a: 1 },
-              nested: {
-                x: {
-                  y: { z: "deep" }
-                }
+            blob: Blob(5 bytes, "text/plain")
+          },
+          arrays: {
+            simple: [1, 2, 3],
+            sparse: [
+              1,
+              empty,
+              empty,
+              4
+            ],
+            nested: [[1], [2, [3]]]
+          },
+          objects: {
+            simple: { a: 1 },
+            nested: {
+              x: {
+                y: { z: "deep" }
               }
+            }
+          },
+          elements: {
+            div: <div className="test">Hello</div>,
+            fragment: [
+              <span>a</span>,
+              <span>b</span>
+            ],
+            suspense: <Suspense fallback="...">
+              <p>content</p>
+            </Suspense>
+          },
+          promises: {
+            resolved: "immediate",
+            delayed: Pending
+          },
+          iterators: {
+            sync: Iterator {}
+          },
+          refs: {
+            dup: {
+              a: { id: 1 },
+              b: { id: 1 }
             },
-            elements: {
-              div: <div className="test">Hello</div>,
-              fragment: [
-                <span>a</span>,
-                <span>b</span>
-              ],
-              suspense: <Suspense fallback="...">
-                <p>content</p>
-              </Suspense>
-            },
-            promises: {
-              resolved: "immediate",
-              delayed: Pending
-            },
-            iterators: {
-              sync: Iterator {}
-            },
-            refs: {
-              dup: {
-                a: { id: 1 },
-                b: { id: 1 }
-              },
-              cyclic: {
-                name: "cyclic",
-                self: [Circular]
-              }
-            },
-            action: [Function: serverAction]
-          }} />
+            cyclic: {
+              name: "cyclic",
+              self: [Circular]
+            }
+          },
+          action: [Function: serverAction]
+        }} />
       </Suspense>
     </div>"
   `);
@@ -158,95 +158,95 @@ test("kitchensink sample - renders all RSC protocol types", async () => {
         <p>Loading...</p>
       }>
         <DataDisplay data={{
-            primitives: {
-              null: null,
-              true: true,
-              false: false,
-              int: 42,
-              float: 3.14159,
-              string: "hello world",
-              empty: "",
-              dollar: "$special",
-              unicode: "Hello 世界 🌍"
+          primitives: {
+            null: null,
+            true: true,
+            false: false,
+            int: 42,
+            float: 3.14159,
+            string: "hello world",
+            empty: "",
+            dollar: "$special",
+            unicode: "Hello 世界 🌍"
+          },
+          special: {
+            negZero: -0,
+            inf: Infinity,
+            negInf: -Infinity,
+            nan: NaN
+          },
+          types: {
+            date: Date(2024-01-15T12:00:00.000Z),
+            bigint: 12345678901234567890n,
+            symbol: Symbol(mySymbol)
+          },
+          binary: {
+            uint8: Uint8Array(5) [1, 2, 3, 4, 5],
+            int32: Int32Array(3) [-1, 0, 2147483647],
+            float64: Float64Array(2) [3.14159, 2.71828]
+          },
+          collections: {
+            map: Map(2) {
+              "a" => 1,
+              "b" => { nested: true }
             },
-            special: {
-              negZero: -0,
-              inf: Infinity,
-              negInf: -Infinity,
-              nan: NaN
+            set: Set(3) {
+              1,
+              2,
+              "three"
             },
-            types: {
-              date: Date(2024-01-15T12:00:00.000Z),
-              bigint: 12345678901234567890n,
-              symbol: Symbol(mySymbol)
+            formData: FormData {
+              key: "value"
             },
-            binary: {
-              uint8: Uint8Array(5) [1, 2, 3, 4, 5],
-              int32: Int32Array(3) [-1, 0, 2147483647],
-              float64: Float64Array(2) [3.14159, 2.71828]
-            },
-            collections: {
-              map: Map(2) {
-                "a" => 1,
-                "b" => { nested: true }
-              },
-              set: Set(3) {
-                1,
-                2,
-                "three"
-              },
-              formData: FormData {
-                key: "value"
-              },
-              blob: Blob(5 bytes, "text/plain")
-            },
-            arrays: {
-              simple: [1, 2, 3],
-              sparse: [
-                1,
-                empty,
-                empty,
-                4
-              ],
-              nested: [[1], [2, [3]]]
-            },
-            objects: {
-              simple: { a: 1 },
-              nested: {
-                x: {
-                  y: { z: "deep" }
-                }
+            blob: Blob(5 bytes, "text/plain")
+          },
+          arrays: {
+            simple: [1, 2, 3],
+            sparse: [
+              1,
+              empty,
+              empty,
+              4
+            ],
+            nested: [[1], [2, [3]]]
+          },
+          objects: {
+            simple: { a: 1 },
+            nested: {
+              x: {
+                y: { z: "deep" }
               }
+            }
+          },
+          elements: {
+            div: <div className="test">Hello</div>,
+            fragment: [
+              <span>a</span>,
+              <span>b</span>
+            ],
+            suspense: <Suspense fallback="...">
+              <p>content</p>
+            </Suspense>
+          },
+          promises: {
+            resolved: "immediate",
+            delayed: "delayed"
+          },
+          iterators: {
+            sync: Iterator {}
+          },
+          refs: {
+            dup: {
+              a: { id: 1 },
+              b: { id: 1 }
             },
-            elements: {
-              div: <div className="test">Hello</div>,
-              fragment: [
-                <span>a</span>,
-                <span>b</span>
-              ],
-              suspense: <Suspense fallback="...">
-                <p>content</p>
-              </Suspense>
-            },
-            promises: {
-              resolved: "immediate",
-              delayed: "delayed"
-            },
-            iterators: {
-              sync: Iterator {}
-            },
-            refs: {
-              dup: {
-                a: { id: 1 },
-                b: { id: 1 }
-              },
-              cyclic: {
-                name: "cyclic",
-                self: [Circular]
-              }
-            },
-            action: [Function: serverAction]
-          }} />
+            cyclic: {
+              name: "cyclic",
+              self: [Circular]
+            }
+          },
+          action: [Function: serverAction]
+        }} />
       </Suspense>
     </div>"
   `);

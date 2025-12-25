@@ -34,8 +34,14 @@ test("clientref sample - renders client module exports passed as props", async (
     "<div>
       <h1>Client Reference</h1>
       <div style={{ display: "flex", gap: 12 }}>
-        <ThemedBox theme={{ background: "#1a1a1a", color: "#fff" }} label="Dark" />
-        <ThemedBox theme={{ background: "#f5f5f5", color: "#000" }} label="Light" />
+        <ThemedBox
+          theme={{ background: "#1a1a1a", color: "#fff" }}
+          label="Dark"
+        />
+        <ThemedBox
+          theme={{ background: "#f5f5f5", color: "#000" }}
+          label="Light"
+        />
       </div>
     </div>"
   `);
