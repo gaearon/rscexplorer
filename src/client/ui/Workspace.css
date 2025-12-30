@@ -3,53 +3,8 @@
 .Workspace {
   flex: 1;
   min-height: 0;
-  display: grid;
-  grid-template-columns: 50% 50%;
-  grid-template-rows: 50% 50%;
-  grid-template-areas:
-    "server flight"
-    "client preview";
-  overflow: hidden;
-}
-
-/* Grid positioning */
-
-.Workspace-server,
-.Workspace-client,
-.Workspace-flight,
-.Workspace-preview {
   display: flex;
-  min-width: 0;
-  min-height: 0;
-}
-
-.Workspace-server > *,
-.Workspace-client > *,
-.Workspace-flight > *,
-.Workspace-preview > * {
-  flex: 1;
-  min-width: 0;
-  min-height: 0;
-}
-
-.Workspace-server {
-  grid-area: server;
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-
-.Workspace-client {
-  grid-area: client;
-  border-right: 1px solid var(--border);
-}
-
-.Workspace-flight {
-  grid-area: flight;
-  border-bottom: 1px solid var(--border);
-}
-
-.Workspace-preview {
-  grid-area: preview;
+  overflow: hidden;
 }
 
 /* Loading states */

@@ -1,0 +1,139 @@
+/* ResizablePanes component styles */
+
+.ResizablePanes {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: var(--col-percent) 0 calc(100% - var(--col-percent));
+  grid-template-rows: var(--row-percent) 0 calc(100% - var(--row-percent));
+  overflow: hidden;
+  position: relative;
+}
+
+/* Pane containers */
+.ResizablePanes-pane {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ResizablePanes-pane > * {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.ResizablePanes-topLeft {
+  grid-column: 1;
+  grid-row: 1;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.ResizablePanes-topRight {
+  grid-column: 3;
+  grid-row: 1;
+  border-bottom: 1px solid var(--border);
+}
+
+.ResizablePanes-bottomLeft {
+  grid-column: 1;
+  grid-row: 3;
+  border-right: 1px solid var(--border);
+}
+
+.ResizablePanes-bottomRight {
+  grid-column: 3;
+  grid-row: 3;
+}
+
+/* Resize handles */
+.ResizablePanes-handle {
+  position: relative;
+  z-index: 10;
+  background: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.ResizablePanes-handle:hover,
+.ResizablePanes-handle:focus-visible {
+  background: var(--border);
+}
+
+.ResizablePanes-handle:focus-visible {
+  outline: 2px solid #ffd54f;
+  outline-offset: -2px;
+}
+
+/* Vertical handles (for horizontal resizing - col width) */
+.ResizablePanes-handle--vertical {
+  grid-column: 2;
+  width: 5px;
+  margin-left: -2px;
+  margin-right: -3px;
+  cursor: col-resize;
+}
+
+.ResizablePanes-handle--vertical.ResizablePanes-handle--top {
+  grid-row: 1;
+}
+
+.ResizablePanes-handle--vertical.ResizablePanes-handle--bottom {
+  grid-row: 3;
+}
+
+/* Horizontal handles (for vertical resizing - row height) */
+.ResizablePanes-handle--horizontal {
+  grid-row: 2;
+  height: 5px;
+  margin-top: -2px;
+  margin-bottom: -3px;
+  cursor: row-resize;
+}
+
+.ResizablePanes-handle--horizontal.ResizablePanes-handle--left {
+  grid-column: 1;
+}
+
+.ResizablePanes-handle--horizontal.ResizablePanes-handle--right {
+  grid-column: 3;
+}
+
+/* Intersection handle (center) */
+.ResizablePanes-handle--intersection {
+  grid-column: 2;
+  grid-row: 2;
+  width: 9px;
+  height: 9px;
+  margin-left: -4px;
+  margin-top: -4px;
+  cursor: move;
+  border-radius: 2px;
+  z-index: 11;
+}
+
+.ResizablePanes-handle--intersection:hover,
+.ResizablePanes-handle--intersection:focus-visible {
+  background: #444;
+}
+
+/* Visual indicator for the intersection */
+.ResizablePanes-handle--intersection::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  transform: translate(-50%, -50%);
+  background: var(--text-dim);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.ResizablePanes-handle--intersection:hover::before,
+.ResizablePanes-handle--intersection:focus-visible::before {
+  opacity: 1;
+}
