@@ -5,6 +5,7 @@ import React, {
   useEffect,
   type ReactNode,
   type MouseEvent as ReactMouseEvent,
+  type TouchEvent as ReactTouchEvent,
 } from "react";
 import "./ResizablePanes.css";
 
@@ -45,6 +46,7 @@ export function ResizablePanes({
     return Math.min(MAX_SIZE_PERCENT, Math.max(MIN_SIZE_PERCENT, value));
   };
 
+  // Start drag (mouse)
   const handleMouseDown = useCallback(
     (type: "horizontal" | "vertical" | "both") => (e: ReactMouseEvent) => {
       e.preventDefault();
@@ -62,7 +64,24 @@ export function ResizablePanes({
     [colPercent, rowPercent],
   );
 
+  // Start drag (touch)
+  const handleTouchStart = useCallback(
+    (type: "horizontal" | "vertical" | "both") => (e: ReactTouchEvent) => {
+      const touch = e.touches[0];
+      if (!touch) return;
+      dragStateRef.current = {
+        type,
+        startX: touch.clientX,
+        startY: touch.clientY,
+        startColPercent: colPercent,
+        startRowPercent: rowPercent,
+      };
+    },
+    [colPercent, rowPercent],
+  );
+
   useEffect(() => {
+    // Handle mouse move
     const handleMouseMove = (e: MouseEvent): void => {
       const dragState = dragStateRef.current;
       if (!dragState || !containerRef.current) return;
@@ -82,7 +101,34 @@ export function ResizablePanes({
       }
     };
 
-    const handleMouseUp = (): void => {
+    // Handle touch move
+    const handleTouchMove = (e: TouchEvent): void => {
+      const dragState = dragStateRef.current;
+      if (!dragState || !containerRef.current) return;
+
+      const touch = e.touches[0];
+      if (!touch) return;
+
+      // Prevent scrolling while dragging
+      e.preventDefault();
+
+      const rect = containerRef.current.getBoundingClientRect();
+
+      if (dragState.type === "horizontal" || dragState.type === "both") {
+        const deltaX = touch.clientX - dragState.startX;
+        const deltaPercent = (deltaX / rect.width) * 100;
+        setColPercent(clamp(dragState.startColPercent + deltaPercent));
+      }
+
+      if (dragState.type === "vertical" || dragState.type === "both") {
+        const deltaY = touch.clientY - dragState.startY;
+        const deltaPercent = (deltaY / rect.height) * 100;
+        setRowPercent(clamp(dragState.startRowPercent + deltaPercent));
+      }
+    };
+
+    // Handle drag end (mouse and touch)
+    const handleDragEnd = (): void => {
       if (dragStateRef.current) {
         dragStateRef.current = null;
         document.body.style.cursor = "";
@@ -91,11 +137,17 @@ export function ResizablePanes({
     };
 
     document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("mouseup", handleDragEnd);
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+    document.addEventListener("touchend", handleDragEnd);
+    document.addEventListener("touchcancel", handleDragEnd);
 
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("mouseup", handleDragEnd);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleDragEnd);
+      document.removeEventListener("touchcancel", handleDragEnd);
     };
   }, []);
 
@@ -130,6 +182,7 @@ export function ResizablePanes({
       <div
         className="ResizablePanes-handle ResizablePanes-handle--vertical ResizablePanes-handle--top"
         onMouseDown={handleMouseDown("horizontal")}
+        onTouchStart={handleTouchStart("horizontal")}
         onDoubleClick={handleDoubleClick("horizontal")}
         role="separator"
         aria-orientation="vertical"
@@ -144,6 +197,7 @@ export function ResizablePanes({
       <div
         className="ResizablePanes-handle ResizablePanes-handle--horizontal ResizablePanes-handle--left"
         onMouseDown={handleMouseDown("vertical")}
+        onTouchStart={handleTouchStart("vertical")}
         onDoubleClick={handleDoubleClick("vertical")}
         role="separator"
         aria-orientation="horizontal"
@@ -155,6 +209,7 @@ export function ResizablePanes({
       <div
         className="ResizablePanes-handle ResizablePanes-handle--intersection"
         onMouseDown={handleMouseDown("both")}
+        onTouchStart={handleTouchStart("both")}
         onDoubleClick={handleDoubleClick("both")}
         role="separator"
         aria-label="Resize all panes"
@@ -165,6 +220,7 @@ export function ResizablePanes({
       <div
         className="ResizablePanes-handle ResizablePanes-handle--horizontal ResizablePanes-handle--right"
         onMouseDown={handleMouseDown("vertical")}
+        onTouchStart={handleTouchStart("vertical")}
         onDoubleClick={handleDoubleClick("vertical")}
         role="separator"
         aria-orientation="horizontal"
@@ -179,6 +235,7 @@ export function ResizablePanes({
       <div
         className="ResizablePanes-handle ResizablePanes-handle--vertical ResizablePanes-handle--bottom"
         onMouseDown={handleMouseDown("horizontal")}
+        onTouchStart={handleTouchStart("horizontal")}
         onDoubleClick={handleDoubleClick("horizontal")}
         role="separator"
         aria-orientation="vertical"

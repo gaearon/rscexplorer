@@ -137,3 +137,31 @@
 .ResizablePanes-handle--intersection:focus-visible::before {
   opacity: 1;
 }
+
+/* Touch device improvements - larger hit targets */
+@media (pointer: coarse) {
+  .ResizablePanes-handle--vertical {
+    width: 16px;
+    margin-left: -8px;
+    margin-right: -8px;
+  }
+
+  .ResizablePanes-handle--horizontal {
+    height: 16px;
+    margin-top: -8px;
+    margin-bottom: -8px;
+  }
+
+  .ResizablePanes-handle--intersection {
+    width: 24px;
+    height: 24px;
+    margin-left: -12px;
+    margin-top: -12px;
+  }
+
+  .ResizablePanes-handle--intersection::before {
+    width: 8px;
+    height: 8px;
+    opacity: 0.5;
+  }
+}
