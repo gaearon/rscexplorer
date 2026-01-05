@@ -4,6 +4,7 @@ import { CodeEditor } from "./CodeEditor.tsx";
 import { FlightLog } from "./FlightLog.tsx";
 import { LivePreview } from "./LivePreview.tsx";
 import { Pane } from "./Pane.tsx";
+import { ResizablePanes } from "./ResizablePanes.tsx";
 import "./Workspace.css";
 
 type WorkspaceProps = {
@@ -65,47 +66,49 @@ export function Workspace({
 
   return (
     <main className="Workspace">
-      <div className="Workspace-server">
-        <CodeEditor label="server" defaultValue={serverCode} onChange={handleServerChange} />
-      </div>
-      <div className="Workspace-client">
-        <CodeEditor label="client" defaultValue={clientCode} onChange={handleClientChange} />
-      </div>
-      <div className="Workspace-flight">
-        <Pane label="flight">
-          {isLoading ? (
-            <div className="Workspace-loadingOutput">
-              <span className="Workspace-loadingEmpty Workspace-loadingEmpty--waiting">
-                Loading
-              </span>
-            </div>
-          ) : isError ? (
-            <pre className="Workspace-errorOutput">{session.state.message}</pre>
-          ) : (
-            <FlightLog
-              entries={entries}
-              cursor={cursor}
-              availableActions={session.state.availableActions}
-              onAddRawAction={session.addRawAction}
-              onDeleteEntry={session.timeline.deleteEntry}
-            />
-          )}
-        </Pane>
-      </div>
-      <div className="Workspace-preview">
-        <LivePreview
-          entries={entries}
-          cursor={cursor}
-          totalChunks={totalChunks}
-          isAtStart={isAtStart}
-          isAtEnd={isAtEnd}
-          isStreaming={isStreaming}
-          isLoading={isLoading || isError}
-          onStep={timeline.stepForward}
-          onSkip={timeline.skipToEntryEnd}
-          onReset={reset}
-        />
-      </div>
+      <ResizablePanes
+        topLeft={
+          <CodeEditor label="server" defaultValue={serverCode} onChange={handleServerChange} />
+        }
+        bottomLeft={
+          <CodeEditor label="client" defaultValue={clientCode} onChange={handleClientChange} />
+        }
+        topRight={
+          <Pane label="flight">
+            {isLoading ? (
+              <div className="Workspace-loadingOutput">
+                <span className="Workspace-loadingEmpty Workspace-loadingEmpty--waiting">
+                  Loading
+                </span>
+              </div>
+            ) : isError ? (
+              <pre className="Workspace-errorOutput">{session.state.message}</pre>
+            ) : (
+              <FlightLog
+                entries={entries}
+                cursor={cursor}
+                availableActions={session.state.availableActions}
+                onAddRawAction={session.addRawAction}
+                onDeleteEntry={session.timeline.deleteEntry}
+              />
+            )}
+          </Pane>
+        }
+        bottomRight={
+          <LivePreview
+            entries={entries}
+            cursor={cursor}
+            totalChunks={totalChunks}
+            isAtStart={isAtStart}
+            isAtEnd={isAtEnd}
+            isStreaming={isStreaming}
+            isLoading={isLoading || isError}
+            onStep={timeline.stepForward}
+            onSkip={timeline.skipToEntryEnd}
+            onReset={reset}
+          />
+        }
+      />
     </main>
   );
 }

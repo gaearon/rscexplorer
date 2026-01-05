@@ -1,0 +1,100 @@
+/* ResizablePanes component styles */
+
+.ResizablePanes {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: var(--col-percent) calc(100% - var(--col-percent));
+  grid-template-rows: var(--row-percent) calc(100% - var(--row-percent));
+  overflow: hidden;
+  position: relative;
+}
+
+/* Pane containers */
+.ResizablePanes-pane {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ResizablePanes-pane > * {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.ResizablePanes-topLeft {
+  grid-column: 1;
+  grid-row: 1;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.ResizablePanes-topRight {
+  grid-column: 2;
+  grid-row: 1;
+  border-bottom: 1px solid var(--border);
+}
+
+.ResizablePanes-bottomLeft {
+  grid-column: 1;
+  grid-row: 2;
+  border-right: 1px solid var(--border);
+}
+
+.ResizablePanes-bottomRight {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+/* Dividers - continuous handles spanning full height/width */
+.ResizablePanes-divider {
+  position: absolute;
+  z-index: 10;
+  background: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.ResizablePanes-divider:hover,
+.ResizablePanes-divider:focus-visible {
+  background: var(--border);
+}
+
+.ResizablePanes-divider:focus-visible {
+  outline: 2px solid #ffd54f;
+  outline-offset: -1px;
+}
+
+/* Vertical divider (full height) - controls column split */
+.ResizablePanes-divider--vertical {
+  top: 0;
+  bottom: 0;
+  left: var(--col-percent);
+  width: 5px;
+  margin-left: -2px;
+  cursor: col-resize;
+}
+
+/* Horizontal divider (full width) - controls row split */
+.ResizablePanes-divider--horizontal {
+  left: 0;
+  right: 0;
+  top: var(--row-percent);
+  height: 5px;
+  margin-top: -2px;
+  cursor: row-resize;
+}
+
+/* Touch device improvements - larger hit targets */
+@media (pointer: coarse) {
+  .ResizablePanes-divider--vertical {
+    width: 16px;
+    margin-left: -8px;
+  }
+
+  .ResizablePanes-divider--horizontal {
+    height: 16px;
+    margin-top: -8px;
+  }
+}
